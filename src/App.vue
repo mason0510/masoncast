@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { usePlayerStore } from './stores/player'
 import { podcastAPI } from './api/podcast'
 import Player from './components/Player.vue'
@@ -7,6 +7,14 @@ import Player from './components/Player.vue'
 const playerStore = usePlayerStore()
 const episodes = ref([])
 const loading = ref(true)
+const activeTab = ref('discover') // discover, subscribed, favorites, trending
+
+const tabs = [
+  { id: 'discover', name: '发现', icon: 'compass' },
+  { id: 'trending', name: '热门', icon: 'fire' },
+  { id: 'subscribed', name: '订阅', icon: 'bookmark' },
+  { id: 'favorites', name: '收藏', icon: 'heart' }
+]
 
 onMounted(async () => {
   try {
@@ -27,6 +35,23 @@ const playEpisode = (episode) => {
 // 判断是否为视频（通过URL后缀）
 const isVideo = (url) => {
   return /\.(mp4|webm|mov|avi|mkv)$/i.test(url)
+}
+
+// 根据Tab过滤内容（目前全显示，后续可以添加分类逻辑）
+const filteredEpisodes = computed(() => {
+  // TODO: 根据activeTab过滤不同内容
+  return episodes.value
+})
+
+// 获取SVG图标
+const getIcon = (iconName) => {
+  const icons = {
+    compass: 'M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z',
+    fire: 'M8 0a1 1 0 011 1v5.268l4.562-2.634a1 1 0 011.518.864v5.536a1 1 0 01-1.518.864L9 8.232V13a1 1 0 11-2 0V8.232l-4.562 2.666A1 1 0 011 10.034V4.498a1 1 0 011.518-.864L7 6.268V1a1 1 0 011-1z',
+    bookmark: 'M2 2a2 2 0 012-2h8a2 2 0 012 2v13.5a.5.5 0 01-.777.416L8 13.101l-5.223 2.815A.5.5 0 012 15.5V2z',
+    heart: 'M8 14s6-5.686 6-10A6 6 0 002 4c0 4.314 6 10 6 10z'
+  }
+  return icons[iconName] || icons.compass
 }
 </script>
 
@@ -58,6 +83,26 @@ const isVideo = (url) => {
       </div>
     </nav>
 
+    <!-- Tab导航 -->
+    <div class="tabs-container">
+      <div class="tabs-wrapper">
+        <div class="tabs">
+          <button
+            v-for="tab in tabs"
+            :key="tab.id"
+            :class="['tab', { active: activeTab === tab.id }]"
+            @click="activeTab = tab.id"
+          >
+            <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+              <path :d="getIcon(tab.icon)"/>
+            </svg>
+            <span>{{ tab.name }}</span>
+          </button>
+        </div>
+        <div class="tab-indicator" :style="{ transform: `translateX(${tabs.findIndex(t => t.id === activeTab) * 100}%)` }"></div>
+      </div>
+    </div>
+
     <!-- 主内容区 -->
     <main class="main">
       <!-- 加载状态 -->
@@ -67,17 +112,33 @@ const isVideo = (url) => {
       </div>
 
       <!-- 空状态 -->
-      <div v-else-if="episodes.length === 0" class="empty-state">
+      <div v-else-if="filteredEpisodes.length === 0" class="empty-state">
         <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
           <circle cx="60" cy="60" r="50" stroke="currentColor" stroke-width="2" opacity="0.2"/>
           <path d="M50 45v30l25-15z" fill="currentColor" opacity="0.3"/>
         </svg>
         <h2>暂无播客内容</h2>
-        <p>敬请期待精彩内容...</p>
+        <p v-if="activeTab === 'discover'">敬请期待精彩内容...</p>
+        <p v-else-if="activeTab === 'subscribed'">您还没有订阅任何播客</p>
+        <p v-else-if="activeTab === 'favorites'">您还没有收藏任何播客</p>
+        <p v-else>暂无热门内容</p>
       </div>
 
       <!-- 内容网格 -->
       <div v-else class="content-wrapper">
+        <!-- Tab标题 -->
+        <div class="section-header">
+          <h2 class="section-title">
+            <span v-if="activeTab === 'discover'">🎙️ 最新发布</span>
+            <span v-else-if="activeTab === 'trending'">🔥 本周热门</span>
+            <span v-else-if="activeTab === 'subscribed'">📚 我的订阅</span>
+            <span v-else>❤️ 我的收藏</span>
+          </h2>
+          <div class="section-meta">
+            共 {{ filteredEpisodes.length }} 个播客
+          </div>
+        </div>
+
         <!-- 正在播放指示 -->
         <div v-if="playerStore.currentEpisode" class="now-playing-indicator">
           <div class="pulse"></div>
@@ -87,7 +148,7 @@ const isVideo = (url) => {
         <!-- 混排卡片流 -->
         <div class="episodes-grid">
           <div
-            v-for="episode in episodes"
+            v-for="episode in filteredEpisodes"
             :key="episode.id"
             :class="['episode-card', {
               'is-playing': playerStore.currentEpisode?.id === episode.id,
@@ -147,7 +208,7 @@ const isVideo = (url) => {
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
                     <path d="M2 2a2 2 0 012-2h6a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V2z"/>
                   </svg>
-                  {{ episode.play_count }} 次播放
+                  {{ episode.play_count }} 次
                 </span>
               </div>
             </div>
@@ -245,11 +306,113 @@ export default {
   color: #fff;
 }
 
+/* Tab导航 */
+.tabs-container {
+  position: sticky;
+  top: 65px;
+  z-index: 90;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.tabs-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  position: relative;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  position: relative;
+  padding: 1rem 1.5rem;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tab svg {
+  opacity: 0.7;
+  transition: opacity 0.3s;
+}
+
+.tab:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.tab:hover svg {
+  opacity: 1;
+}
+
+.tab.active {
+  color: #fff;
+}
+
+.tab.active svg {
+  opacity: 1;
+}
+
+.tab-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: calc(100% / 4);
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 /* 主内容区 */
 .main {
   max-width: 1400px;
   margin: 0 auto;
   padding: 2rem;
+}
+
+/* Section Header */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.section-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0;
+  background: linear-gradient(135deg, #fff 0%, rgba(255, 255, 255, 0.8) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.section-meta {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.4);
 }
 
 /* 加载和空状态 */
@@ -488,12 +651,22 @@ export default {
 
 /* 响应式 */
 @media (max-width: 768px) {
-  .nav-content {
+  .nav-content, .tabs-wrapper {
     padding: 1rem;
   }
 
   .main {
     padding: 1rem;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
   }
 
   .episodes-grid {
