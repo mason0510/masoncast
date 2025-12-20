@@ -23,50 +23,140 @@ const playEpisode = (episode) => {
   playerStore.play(episode)
   podcastAPI.recordPlay(episode.id)
 }
+
+// 判断是否为视频（通过URL后缀）
+const isVideo = (url) => {
+  return /\.(mp4|webm|mov|avi|mkv)$/i.test(url)
+}
 </script>
 
 <template>
   <div class="app">
-    <header class="header">
-      <h1>🎙️ MasonCast</h1>
-      <p class="subtitle">每日播客，与你分享</p>
-    </header>
+    <!-- 顶部导航 -->
+    <nav class="nav">
+      <div class="nav-content">
+        <div class="logo">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <circle cx="16" cy="16" r="14" fill="url(#gradient)"/>
+            <path d="M14 11v10l8-5z" fill="white"/>
+            <defs>
+              <linearGradient id="gradient" x1="0" y1="0" x2="32" y2="32">
+                <stop offset="0%" stop-color="#667eea"/>
+                <stop offset="100%" stop-color="#764ba2"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <span class="logo-text">MasonCast</span>
+        </div>
+        <div class="nav-actions">
+          <button class="icon-btn">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </nav>
 
+    <!-- 主内容区 -->
     <main class="main">
-      <div v-if="loading" class="loading">加载中...</div>
-
-      <div v-else-if="episodes.length === 0" class="empty">
-        <p>暂无播客内容</p>
-        <p class="hint">敬请期待...</p>
+      <!-- 加载状态 -->
+      <div v-if="loading" class="loading-state">
+        <div class="spinner"></div>
+        <p>加载中...</p>
       </div>
 
-      <div v-else class="episodes-grid">
-        <div
-          v-for="episode in episodes"
-          :key="episode.id"
-          class="episode-card"
-          @click="playEpisode(episode)"
-        >
-          <div class="cover">
-            <img :src="episode.cover_url || '/default-cover.jpg'" :alt="episode.title" />
-            <div class="play-overlay">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="white">
-                <path d="M8 5v14l11-7z"/>
-              </svg>
+      <!-- 空状态 -->
+      <div v-else-if="episodes.length === 0" class="empty-state">
+        <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+          <circle cx="60" cy="60" r="50" stroke="currentColor" stroke-width="2" opacity="0.2"/>
+          <path d="M50 45v30l25-15z" fill="currentColor" opacity="0.3"/>
+        </svg>
+        <h2>暂无播客内容</h2>
+        <p>敬请期待精彩内容...</p>
+      </div>
+
+      <!-- 内容网格 -->
+      <div v-else class="content-wrapper">
+        <!-- 正在播放指示 -->
+        <div v-if="playerStore.currentEpisode" class="now-playing-indicator">
+          <div class="pulse"></div>
+          <span>正在播放</span>
+        </div>
+
+        <!-- 混排卡片流 -->
+        <div class="episodes-grid">
+          <div
+            v-for="episode in episodes"
+            :key="episode.id"
+            :class="['episode-card', {
+              'is-playing': playerStore.currentEpisode?.id === episode.id,
+              'is-video': isVideo(episode.audio_url)
+            }]"
+            @click="playEpisode(episode)"
+          >
+            <!-- 封面容器 -->
+            <div class="cover-container">
+              <img
+                :src="episode.cover_url || '/default-cover.jpg'"
+                :alt="episode.title"
+                class="cover-image"
+              />
+
+              <!-- 视频标识 -->
+              <div v-if="isVideo(episode.audio_url)" class="media-badge video">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="white">
+                  <path d="M1 3a1 1 0 011-1h10a1 1 0 011 1v10a1 1 0 01-1 1H2a1 1 0 01-1-1V3zm13 1.5v7a.5.5 0 00.75.433l3-1.714a.5.5 0 000-.866l-3-1.714A.5.5 0 0014 4.5z"/>
+                </svg>
+              </div>
+
+              <!-- 播放叠加层 -->
+              <div class="play-overlay">
+                <div class="play-button">
+                  <svg v-if="playerStore.currentEpisode?.id !== episode.id" width="32" height="32" viewBox="0 0 32 32" fill="white">
+                    <path d="M11 8v16l13-8z"/>
+                  </svg>
+                  <svg v-else width="32" height="32" viewBox="0 0 32 32" fill="white">
+                    <path d="M10 8h4v16h-4V8zm8 0h4v16h-4V8z"/>
+                  </svg>
+                </div>
+              </div>
+
+              <!-- 播放进度条（如果是当前播放） -->
+              <div v-if="playerStore.currentEpisode?.id === episode.id" class="progress-indicator">
+                <div class="progress-bar"></div>
+              </div>
             </div>
-          </div>
-          <div class="info">
-            <h3 class="title">{{ episode.title }}</h3>
-            <p class="description">{{ episode.description }}</p>
-            <div class="meta">
-              <span class="duration">{{ formatDuration(episode.duration) }}</span>
-              <span class="date">{{ formatDate(episode.publish_date) }}</span>
+
+            <!-- 内容信息 -->
+            <div class="card-content">
+              <h3 class="episode-title">{{ episode.title }}</h3>
+              <p v-if="episode.description" class="episode-description">{{ episode.description }}</p>
+
+              <div class="episode-meta">
+                <span class="meta-item">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+                    <path d="M7 0a7 7 0 100 14A7 7 0 007 0zm1 10H6V6h2v4zm0-5H6V3h2v2z"/>
+                  </svg>
+                  {{ formatDuration(episode.duration) }}
+                </span>
+                <span class="meta-item">
+                  {{ formatDate(episode.publish_date) }}
+                </span>
+                <span class="meta-item">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+                    <path d="M2 2a2 2 0 012-2h6a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V2z"/>
+                  </svg>
+                  {{ episode.play_count }} 次播放
+                </span>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </main>
 
+    <!-- 全局播放器 -->
     <Player />
   </div>
 </template>
@@ -90,134 +180,333 @@ export default {
 </script>
 
 <style scoped>
+* {
+  box-sizing: border-box;
+}
+
 .app {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #000;
+  color: #fff;
   padding-bottom: 120px;
 }
 
-.header {
-  text-align: center;
-  padding: 3rem 1rem;
-  color: white;
+/* 导航栏 */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.header h1 {
-  font-size: 3rem;
-  margin: 0;
-  font-weight: 700;
-}
-
-.subtitle {
-  font-size: 1.2rem;
-  opacity: 0.9;
-  margin-top: 0.5rem;
-}
-
-.main {
-  max-width: 1200px;
+.nav-content {
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.loading, .empty {
-  text-align: center;
-  color: white;
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logo-text {
   font-size: 1.5rem;
-  padding: 4rem 1rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.hint {
-  font-size: 1rem;
-  opacity: 0.7;
-  margin-top: 0.5rem;
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
 }
 
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+/* 主内容区 */
+.main {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* 加载和空状态 */
+.loading-state, .empty-state {
+  text-align: center;
+  padding: 6rem 2rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 3px solid rgba(102, 126, 234, 0.1);
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1.5rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.empty-state h2 {
+  margin: 1.5rem 0 0.5rem;
+  font-size: 1.5rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* 正在播放指示 */
+.now-playing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #667eea;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+/* 卡片网格 */
 .episodes-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
 }
 
 .episode-card {
-  background: white;
-  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
   overflow: hidden;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
 }
 
 .episode-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+  transform: translateY(-8px);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(102, 126, 234, 0.3);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(102, 126, 234, 0.2);
 }
 
-.cover {
+.episode-card.is-playing {
+  border-color: rgba(102, 126, 234, 0.6);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+}
+
+/* 封面容器 */
+.cover-container {
   position: relative;
   width: 100%;
   padding-top: 100%;
-  background: #f0f0f0;
   overflow: hidden;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
 }
 
-.cover img {
+.cover-image {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.episode-card:hover .cover-image {
+  transform: scale(1.05);
+}
+
+.episode-card.is-playing .cover-image {
+  animation: breathing 3s ease-in-out infinite;
+}
+
+@keyframes breathing {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+/* 媒体标识 */
+.media-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 2;
+}
+
+.media-badge.video {
+  background: rgba(220, 38, 38, 0.9);
+}
+
+/* 播放叠加层 */
 .play-overlay {
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.3);
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity 0.3s;
 }
 
-.episode-card:hover .play-overlay {
+.episode-card:hover .play-overlay,
+.episode-card.is-playing .play-overlay {
   opacity: 1;
 }
 
-.info {
-  padding: 1rem;
-}
-
-.title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin: 0 0 0.5rem 0;
-  color: #333;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
-
-.description {
-  font-size: 0.9rem;
-  color: #666;
-  margin: 0 0 0.75rem 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
-
-.meta {
+.play-button {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
   display: flex;
-  justify-content: space-between;
-  font-size: 0.85rem;
-  color: #999;
+  align-items: center;
+  justify-content: center;
+  transform: scale(0.9);
+  transition: transform 0.2s;
+}
+
+.episode-card:hover .play-button {
+  transform: scale(1);
+}
+
+/* 进度指示器 */
+.progress-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.progress-bar {
+  height: 100%;
+  width: 30%;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  animation: progress 2s linear infinite;
+}
+
+@keyframes progress {
+  0% { width: 30%; }
+  50% { width: 70%; }
+  100% { width: 30%; }
+}
+
+/* 卡片内容 */
+.card-content {
+  padding: 1.25rem;
+}
+
+.episode-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+  color: #fff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.4;
+}
+
+.episode-description {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 0 1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.5;
+}
+
+.episode-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .nav-content {
+    padding: 1rem;
+  }
+
+  .main {
+    padding: 1rem;
+  }
+
+  .episodes-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
+  }
+
+  .card-content {
+    padding: 1rem;
+  }
+
+  .episode-title {
+    font-size: 1rem;
+  }
 }
 </style>
