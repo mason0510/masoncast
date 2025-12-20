@@ -13,7 +13,7 @@ const tabs = [
   { id: 'discover', name: '发现', icon: 'compass' },
   { id: 'trending', name: '热门', icon: 'fire' },
   { id: 'subscribed', name: '订阅', icon: 'bookmark' },
-  { id: 'favorites', name: '收藏', icon: 'heart' }
+  { id: 'favorites', name: '喜欢', icon: 'heart' }
 ]
 
 onMounted(async () => {
@@ -129,10 +129,10 @@ const getIcon = (iconName) => {
         <!-- Tab标题 -->
         <div class="section-header">
           <h2 class="section-title">
-            <span v-if="activeTab === 'discover'">🎙️ 最新发布</span>
-            <span v-else-if="activeTab === 'trending'">🔥 本周热门</span>
-            <span v-else-if="activeTab === 'subscribed'">📚 我的订阅</span>
-            <span v-else>❤️ 我的收藏</span>
+            <span v-if="activeTab === 'discover'">🎙️ 最新</span>
+            <span v-else-if="activeTab === 'trending'">🔥 热门</span>
+            <span v-else-if="activeTab === 'subscribed'">📚 订阅</span>
+            <span v-else>❤️ 喜欢</span>
           </h2>
           <div class="section-meta">
             共 {{ filteredEpisodes.length }} 个播客
@@ -337,16 +337,16 @@ export default {
 
 .tab {
   position: relative;
-  padding: 1rem 1.5rem;
+  padding: 0.875rem 1.25rem;
   border: none;
   background: transparent;
   color: rgba(255, 255, 255, 0.6);
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.375rem;
   transition: all 0.3s;
   white-space: nowrap;
   flex-shrink: 0;
