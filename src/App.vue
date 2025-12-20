@@ -9,6 +9,8 @@ const episodes = ref([])
 const loading = ref(true)
 const activeTab = ref('discover') // discover, subscribed, favorites, trending
 const indicatorStyle = ref({ width: '0px', transform: 'translateX(0px)' })
+const searchQuery = ref('')
+const showSearch = ref(false)
 
 const tabs = [
   { id: 'discover', name: '发现', icon: 'compass' },
@@ -64,10 +66,21 @@ const isVideo = (url) => {
   return /\.(mp4|webm|mov|avi|mkv)$/i.test(url)
 }
 
-// 根据Tab过滤内容（目前全显示，后续可以添加分类逻辑）
+// 根据Tab和搜索过滤内容
 const filteredEpisodes = computed(() => {
+  let result = episodes.value
+
+  // 搜索过滤
+  if (searchQuery.value.trim()) {
+    const query = searchQuery.value.toLowerCase()
+    result = result.filter(episode =>
+      episode.title.toLowerCase().includes(query) ||
+      (episode.description && episode.description.toLowerCase().includes(query))
+    )
+  }
+
   // TODO: 根据activeTab过滤不同内容
-  return episodes.value
+  return result
 })
 
 // 获取SVG图标
@@ -101,13 +114,40 @@ const getIcon = (iconName) => {
           <span class="logo-text">MasonCast</span>
         </div>
         <div class="nav-actions">
-          <button class="icon-btn">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <!-- 搜索按钮 -->
+          <button class="icon-btn" @click="showSearch = !showSearch">
+            <svg v-if="!showSearch" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
               <path d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"/>
+            </svg>
+            <svg v-else width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"/>
             </svg>
           </button>
         </div>
       </div>
+
+      <!-- 搜索栏 -->
+      <transition name="search-slide">
+        <div v-if="showSearch" class="search-bar">
+          <div class="search-input-wrapper">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor" class="search-icon">
+              <path d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"/>
+            </svg>
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="搜索播客标题或内容..."
+              class="search-input"
+              autofocus
+            />
+            <button v-if="searchQuery" @click="searchQuery = ''" class="clear-btn">
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </transition>
     </nav>
 
     <!-- Tab导航 -->
@@ -331,6 +371,87 @@ export default {
 .icon-btn:hover {
   background: rgba(255, 255, 255, 0.2);
   color: #fff;
+}
+
+/* 搜索栏 */
+.search-bar {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem 1rem;
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  transition: all 0.3s;
+}
+
+.search-input-wrapper:focus-within {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(102, 126, 234, 0.5);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.search-icon {
+  color: rgba(255, 255, 255, 0.5);
+  margin-right: 0.75rem;
+  flex-shrink: 0;
+}
+
+.search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-size: 0.95rem;
+  padding: 0;
+}
+
+.search-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.clear-btn {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  margin-left: 0.5rem;
+}
+
+.clear-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+/* 搜索栏动画 */
+.search-slide-enter-active,
+.search-slide-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.search-slide-enter-from {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.search-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
 }
 
 /* Tab导航 */
