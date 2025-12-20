@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { usePlayerStore } from './stores/player'
 import { podcastAPI } from './api/podcast'
 import Player from './components/Player.vue'
@@ -8,6 +8,7 @@ const playerStore = usePlayerStore()
 const episodes = ref([])
 const loading = ref(true)
 const activeTab = ref('discover') // discover, subscribed, favorites, trending
+const indicatorStyle = ref({ width: '0px', transform: 'translateX(0px)' })
 
 const tabs = [
   { id: 'discover', name: '发现', icon: 'compass' },
@@ -15,6 +16,26 @@ const tabs = [
   { id: 'subscribed', name: '订阅', icon: 'bookmark' },
   { id: 'favorites', name: '喜欢', icon: 'heart' }
 ]
+
+// 更新指示器位置
+const updateIndicator = async () => {
+  await nextTick()
+  const activeIndex = tabs.findIndex(t => t.id === activeTab.value)
+  const tabElements = document.querySelectorAll('.tab')
+  if (tabElements[activeIndex]) {
+    const activeElement = tabElements[activeIndex]
+    indicatorStyle.value = {
+      width: `${activeElement.offsetWidth}px`,
+      transform: `translateX(${activeElement.offsetLeft}px)`
+    }
+  }
+}
+
+// 切换Tab
+const switchTab = (tabId) => {
+  activeTab.value = tabId
+  updateIndicator()
+}
 
 onMounted(async () => {
   try {
@@ -25,6 +46,12 @@ onMounted(async () => {
   } finally {
     loading.value = false
   }
+
+  // 初始化指示器位置
+  updateIndicator()
+
+  // 窗口大小变化时更新指示器
+  window.addEventListener('resize', updateIndicator)
 })
 
 const playEpisode = (episode) => {
@@ -91,7 +118,7 @@ const getIcon = (iconName) => {
             v-for="tab in tabs"
             :key="tab.id"
             :class="['tab', { active: activeTab === tab.id }]"
-            @click="activeTab = tab.id"
+            @click="switchTab(tab.id)"
           >
             <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
               <path :d="getIcon(tab.icon)"/>
@@ -99,7 +126,7 @@ const getIcon = (iconName) => {
             <span>{{ tab.name }}</span>
           </button>
         </div>
-        <div class="tab-indicator" :style="{ transform: `translateX(${tabs.findIndex(t => t.id === activeTab) * 100}%)` }"></div>
+        <div class="tab-indicator" :style="indicatorStyle"></div>
       </div>
     </div>
 
@@ -378,9 +405,8 @@ export default {
   bottom: 0;
   left: 0;
   height: 2px;
-  width: calc(100% / 4);
   background: linear-gradient(90deg, #667eea, #764ba2);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* 主内容区 */
