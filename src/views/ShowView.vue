@@ -6,7 +6,7 @@ import { showMap, shows } from '../data/catalog'
 
 const route = useRoute()
 const show = computed(() => showMap[String(route.params.slug || '')])
-const otherShows = computed(() => shows.filter((item) => item.slug !== show.value?.slug))
+const otherShows = computed(() => shows.filter((item) => item.slug !== show.value?.slug && item.status === 'published'))
 
 const scrollToSection = (sectionId: string) => {
   document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -29,7 +29,7 @@ onMounted(() => {
           <img :src="show.coverUrl" :alt="show.title" />
         </div>
         <div class="panel copy">
-          <span class="kicker">{{ show.showNumber }} / {{ show.eyebrow }}</span>
+          <span class="kicker">{{ show.showNumber }} / {{ show.categoryLabel }} / {{ show.eyebrow }}</span>
           <h1>{{ show.title }}</h1>
           <p class="lead">{{ show.lead }}</p>
           <p class="summary">{{ show.summary }}</p>
@@ -38,6 +38,7 @@ onMounted(() => {
             <RouterLink class="button ghost" to="/">返回首页</RouterLink>
           </div>
           <div class="badges">
+            <span>{{ show.categoryLabel }}</span>
             <span v-for="badge in show.badges" :key="badge">{{ badge }}</span>
           </div>
         </div>
@@ -75,7 +76,7 @@ onMounted(() => {
           <RouterLink v-for="item in otherShows" :key="item.slug" class="panel archive-card" :to="`/show/${item.slug}`">
             <img :src="item.coverUrl" :alt="item.title" />
             <div class="archive-copy">
-              <span class="tag">{{ item.homeTag }}</span>
+              <span class="tag">{{ item.showNumber }} · {{ item.categoryLabel }}</span>
               <h3>{{ item.title }}</h3>
               <p>{{ item.homeDescription }}</p>
               <span class="inline-link">查看这个节目 →</span>

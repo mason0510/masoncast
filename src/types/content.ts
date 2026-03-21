@@ -1,3 +1,6 @@
+export type ContentLaneKey = 'history' | 'family'
+export type ShowStatus = 'published' | 'planned'
+
 export interface Episode {
   id: string
   number: string
@@ -25,4 +28,17 @@ export interface Show {
   badges: string[]
   statement: string
   episodes: Episode[]
+  categoryKey: ContentLaneKey
+  categoryLabel: string
+  status: ShowStatus
+}
+
+export interface ContentLane {
+  key: ContentLaneKey
+  title: string
+  description: string
+  showCount: number
+  stateLabel: string
+  entryLabel: string
+  href?: string
 }

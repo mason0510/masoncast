@@ -1,4 +1,4 @@
-import type { Show } from '../types/content'
+import type { ContentLane, ContentLaneKey, Show } from '../types/content'
 
 const asset = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\//, '')}`
 
@@ -31,7 +31,7 @@ export const shows: Show[] = [
     eyebrow: 'Longform Audiobook / History Narrative',
     lead: '一部围绕二十世纪中国知识分子命运展开的长篇有声节目。',
     summary:
-      '《南渡北归》围绕战争、迁徙、学统与人物命运展开，写的是大时代里一代学人的离散、守望与归来。这里按章节收录全书音频，既适合从头顺听，也适合回到某一章重新进入那一段历史。',
+      '《南渡北归》围绕战争、迁徙、学统与人物命运展开，写的是大时代里一代学人的离散、守望与归来。这里按章节顺序收录全书音频，既适合连续收听，也适合从某一章重新进入。',
     coverUrl: asset('assets/covers/nandu-beigui-cover.svg'),
     homeTag: 'Longform Audiobook',
     homeDescription:
@@ -39,6 +39,9 @@ export const shows: Show[] = [
     badges: ['18 章', 'Longform Audio', '历史叙事'],
     statement:
       '从时代巨变中的学人迁徙，到风雨飘摇中的学术脉络与个人命运，《南渡北归》关注的不是某一个孤立人物，而是一整个时代的精神史、离乱史与回望史。',
+    categoryKey: 'history',
+    categoryLabel: '历史',
+    status: 'published',
     episodes: nanduEpisodes.map(([number, title, summary]) => ({
       id: `nandu-${number}`,
       number: `EP${number}`,
@@ -64,6 +67,9 @@ export const shows: Show[] = [
     badges: ['5 集', '约 99 分钟', '晚清手稿视觉母版'],
     statement:
       '李秀成留下的，不只是败亡者的一篇供词，也是晚清权力如何改写文本、塑造记忆的一处现场。五集节目沿着删改、缺页、批校与遗稿层层推进，把这份史料重新读给今天的人听。',
+    categoryKey: 'history',
+    categoryLabel: '历史',
+    status: 'published',
     episodes: [
       {
         id: 'li-01',
@@ -127,6 +133,88 @@ export const shows: Show[] = [
       },
     ],
   },
+  {
+    showNumber: '节目 03',
+    slug: 'family-parenting',
+    title: '家庭育儿系列',
+    eyebrow: 'Family / Parenting / Practical Care',
+    lead: '写给年轻父母，也写给爷爷奶奶。',
+    summary:
+      '这条内容线围绕常见病、发育、喂养、家庭分歧与养育判断展开，不把育儿做成碎片问答，而是做成一家人都能反复收听、逐步形成共识的节目。',
+    coverUrl: asset('assets/covers/family-parenting-series-cover.svg'),
+    homeTag: 'Family / Parenting',
+    homeDescription:
+      '从崔玉涛、鲍秀兰，到一岁宝宝打完麻腮风后的家庭误判，把发烧、发育与家庭分歧做成适合长期收听的节目。',
+    badges: ['3 集', '约 21 分钟', '写给父母与长辈'],
+    statement:
+      '家庭育儿系列不想把养娃问题做成零碎问答，也不想把任何一个医生神化成唯一答案。更实际的目标，是把常见病、发育、喂养、代际分歧和家庭判断做成可回听的节目，让年轻父母与家里长辈能在同一套语言里讨论孩子。',
+    categoryKey: 'family',
+    categoryLabel: '家庭 / 育儿',
+    status: 'published',
+    episodes: [
+      {
+        id: 'family-01',
+        number: 'EP01',
+        title: '为什么这一代家长几乎都绕不开崔玉涛',
+        summary:
+          '这一期不神化，也不否定，只讨论一件更实在的事：崔玉涛为什么会成为一代中国家庭的公共参考，以及普通家庭到底该怎么正确使用这一路内容。',
+        audioUrl: asset('assets/parenting/audio/ep01-cuiyutao/ep01-cuiyutao.mp3'),
+        duration: '10:01',
+        size: '9.6 MB',
+        tags: ['崔玉涛', '家庭判断', '可下载'],
+        downloadName: '家庭育儿系列-EP01-为什么这一代家长几乎都绕不开崔玉涛.mp3',
+      },
+      {
+        id: 'family-02',
+        number: 'EP02',
+        title: '为什么发育焦虑型家庭更容易走向鲍秀兰',
+        summary:
+          '这期不讨论谁更权威，而是讨论另一件更关键的事：为什么一旦家庭的核心痛点变成发育、筛查和窗口，内容路线就会从常见病判断，慢慢切到发育焦虑与早期识别。',
+        audioUrl: asset('assets/parenting/audio/ep02-baoxiulan/ep02-baoxiulan.mp3'),
+        duration: '5:43',
+        size: '5.5 MB',
+        tags: ['鲍秀兰', '发育焦虑', '可下载'],
+        downloadName: '家庭育儿系列-EP02-为什么发育焦虑型家庭更容易走向鲍秀兰.mp3',
+      },
+      {
+        id: 'family-03',
+        number: 'EP03',
+        title: '一岁宝宝打完麻腮风后发烧，家里最容易误判什么',
+        summary:
+          '把第八天发烧、轻疹、贫血、传染性和联合疫苗风险这些最容易被家里说乱的点拆开讲：哪些仍可能落在典型接种反应时间窗里，哪些不能粗暴归因给疫苗。',
+        audioUrl: asset('assets/parenting/audio/ep03-mmr-fever/ep03-mmr-fever.mp3'),
+        duration: '5:35',
+        size: '5.4 MB',
+        tags: ['麻腮风', '疫苗后发热', '可下载'],
+        downloadName: '家庭育儿系列-EP03-一岁宝宝打完麻腮风后发烧，家里最容易误判什么.mp3',
+      },
+    ],
+  },
 ]
+
+const laneMeta: Record<ContentLaneKey, Omit<ContentLane, 'showCount' | 'stateLabel' | 'entryLabel' | 'href'>> = {
+  history: {
+    key: 'history',
+    title: '历史',
+    description: '当前主内容区。收录《南渡北归》《李秀成供词》这类围绕近代中国、人物命运与文本现场展开的节目。',
+  },
+  family: {
+    key: 'family',
+    title: '家庭 / 育儿',
+    description: '当前已上线《家庭育儿系列》。围绕常见病、发育、喂养与代际分歧，把最容易把人搞乱的育儿问题整理成能反复收听的节目。',
+  },
+}
+
+export const contentLanes: ContentLane[] = (Object.keys(laneMeta) as ContentLaneKey[]).map((key) => {
+  const laneShows = shows.filter((show) => show.categoryKey === key && show.status === 'published')
+
+  return {
+    ...laneMeta[key],
+    showCount: laneShows.length,
+    stateLabel: laneShows.length ? `已上线 ${laneShows.length} 档` : '筹备中',
+    entryLabel: laneShows.length ? laneShows.map((show) => show.title).join(' / ') : '预留给未来新增节目',
+    href: laneShows[0] ? `/show/${laneShows[0].slug}` : undefined,
+  }
+})
 
 export const showMap = Object.fromEntries(shows.map((show) => [show.slug, show])) as Record<string, Show>

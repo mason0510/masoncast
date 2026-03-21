@@ -1,0 +1,66 @@
+<svg width="1600" height="2000" viewBox="0 0 1600 2000" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="195" y1="133" x2="1411" y2="1861" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F5EBD7"/>
+      <stop offset="1" stop-color="#E6D1B0"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="355" y1="329" x2="1263" y2="1650" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1F2C25"/>
+      <stop offset="1" stop-color="#314439"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1147 443) rotate(132.575) scale(532.466 462.014)">
+      <stop stop-color="#FFD49A" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#FFD49A" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="215" y="243" width="1170" height="1534" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="20"/>
+      <feGaussianBlur stdDeviation="40"/>
+      <feComposite in2="hardAlpha" operator="out"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.145098 0 0 0 0 0.0980392 0 0 0 0 0.0627451 0 0 0 0.24 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_2"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_2" result="shape"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="2000" fill="url(#bg)"/>
+  <circle cx="1328" cy="374" r="340" fill="url(#glow)"/>
+  <circle cx="278" cy="1630" r="260" fill="#D99B62" fill-opacity="0.14"/>
+  <circle cx="1402" cy="1760" r="180" fill="#3B5648" fill-opacity="0.12"/>
+  <path d="M0 1468C172 1408.67 322 1399.33 450 1440C578 1480.67 718 1551.33 870 1652C1022 1752.67 1265.33 1828 1600 1878V2000H0V1468Z" fill="#F3E7D1" fill-opacity="0.58"/>
+
+  <g filter="url(#shadow)">
+    <rect x="295" y="323" width="1010" height="1374" rx="46" fill="url(#panel)"/>
+    <rect x="349" y="377" width="902" height="1266" rx="28" stroke="#EAC796" stroke-opacity="0.32" stroke-width="2"/>
+  </g>
+
+  <rect x="405" y="433" width="202" height="40" rx="20" fill="#D08C57" fill-opacity="0.18" stroke="#EAC796" stroke-opacity="0.44"/>
+  <text x="438" y="459" fill="#F3DEC0" font-family="PingFang SC, Noto Sans SC, sans-serif" font-size="22" letter-spacing="4">MASONCAST</text>
+
+  <text x="404" y="648" fill="#F7E9D2" font-family="Songti SC, STFangsong, Noto Serif SC, serif" font-size="122" font-weight="700">家庭育儿系列</text>
+  <text x="408" y="740" fill="#D7C7AF" font-family="PingFang SC, Noto Sans SC, sans-serif" font-size="36" letter-spacing="6">FAMILY / PARENTING</text>
+
+  <text x="407" y="952" fill="#F7E9D2" font-family="Songti SC, STFangsong, Noto Serif SC, serif" font-size="62" font-weight="600">写给年轻父母</text>
+  <text x="407" y="1035" fill="#F7E9D2" font-family="Songti SC, STFangsong, Noto Serif SC, serif" font-size="62" font-weight="600">也写给爷爷奶奶</text>
+
+  <text x="408" y="1182" fill="#D6C5AA" font-family="PingFang SC, Noto Sans SC, sans-serif" font-size="31" letter-spacing="1.2">
+    把发烧、发育、喂养与家庭分歧，
+  </text>
+  <text x="408" y="1232" fill="#D6C5AA" font-family="PingFang SC, Noto Sans SC, sans-serif" font-size="31" letter-spacing="1.2">
+    做成可以一家人反复收听的节目。
+  </text>
+
+  <g opacity="0.94">
+    <circle cx="1038" cy="1082" r="150" fill="#E8BD88" fill-opacity="0.12" stroke="#E8BD88" stroke-opacity="0.22" stroke-width="2"/>
+    <circle cx="1037" cy="1078" r="94" fill="#E8BD88" fill-opacity="0.18"/>
+    <path d="M954 1326C954 1270.22 999.22 1225 1055 1225H1125C1180.78 1225 1226 1270.22 1226 1326V1360H954V1326Z" fill="#E8BD88" fill-opacity="0.18"/>
+    <circle cx="1004" cy="1180" r="34" fill="#F1DAB7" fill-opacity="0.94"/>
+    <circle cx="1147" cy="1165" r="52" fill="#F1DAB7" fill-opacity="0.94"/>
+    <path d="M916 1456C916 1376.49 980.486 1312 1060 1312C1139.51 1312 1204 1376.49 1204 1456V1482H916V1456Z" fill="#F1DAB7" fill-opacity="0.9"/>
+    <path d="M1049 1412C1049 1368.37 1084.37 1333 1128 1333H1168C1211.63 1333 1247 1368.37 1247 1412V1482H1049V1412Z" fill="#D08C57" fill-opacity="0.38"/>
+  </g>
+
+  <line x1="406" y1="1518" x2="1192" y2="1518" stroke="#E9C99D" stroke-opacity="0.22"/>
+  <text x="406" y="1588" fill="#E9D7BA" font-family="PingFang SC, Noto Sans SC, sans-serif" font-size="24" letter-spacing="4">SERIES 03 · PRACTICAL CARE · FAMILY CONVERSATIONS</text>
+</svg>

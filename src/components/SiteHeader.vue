@@ -5,7 +5,7 @@
     <div class="topbar-inner">
       <RouterLink class="brand-link" to="/">
         <span class="brand">MASONCAST</span>
-        <span class="brand-sub">历史播客实验</span>
+        <span class="brand-sub">播客网站</span>
       </RouterLink>
       <nav class="nav">
         <RouterLink to="/">首页</RouterLink>
