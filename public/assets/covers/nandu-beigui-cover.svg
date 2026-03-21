@@ -1,0 +1,26 @@
+<svg width="1200" height="1600" viewBox="0 0 1200 1600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="1600" fill="#10131A"/>
+  <rect width="1200" height="1600" fill="url(#bg)"/>
+  <rect x="70" y="70" width="1060" height="1460" rx="36" stroke="rgba(255,255,255,0.12)"/>
+  <circle cx="944" cy="216" r="220" fill="url(#sun)" fill-opacity="0.45"/>
+  <path d="M78 1040C206 940 312 900 426 920C580 945 684 1048 846 1024C956 1008 1054 934 1124 872V1528H78V1040Z" fill="#1B2230"/>
+  <path d="M78 1188C196 1084 294 1048 392 1062C558 1086 654 1206 832 1188C944 1176 1044 1102 1124 1036V1528H78V1188Z" fill="#202A3C"/>
+  <path d="M132 1240C246 1184 320 1168 414 1188C532 1212 628 1284 758 1292C866 1298 984 1248 1094 1178V1528H132V1240Z" fill="#2A3650"/>
+  <rect x="154" y="226" width="892" height="2" fill="#D0A16B" fill-opacity="0.7"/>
+  <text x="154" y="318" fill="#D5A870" font-size="54" font-family="PingFang SC, Noto Serif SC, serif" letter-spacing="12">PODCAST SERIES</text>
+  <text x="148" y="640" fill="#F3F0EA" font-size="168" font-family="Songti SC, Noto Serif SC, serif" font-weight="700">南渡北归</text>
+  <text x="156" y="760" fill="#B5C2D4" font-size="66" font-family="PingFang SC, sans-serif">有声书 / 叙事播客 / 历史人物群像</text>
+  <text x="156" y="900" fill="#C3CEDC" font-size="44" font-family="PingFang SC, sans-serif">把厚重文本重组为可持续收听的内容资产</text>
+  <text x="158" y="1440" fill="#D4DBE6" font-size="46" font-family="PingFang SC, sans-serif">Longform Audio · Editorial Packaging</text>
+  <defs>
+    <linearGradient id="bg" x1="188" y1="62" x2="970" y2="1558" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#121824"/>
+      <stop offset="0.58" stop-color="#0B0E14"/>
+      <stop offset="1" stop-color="#171D29"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(944 216) rotate(90) scale(220)">
+      <stop stop-color="#F0D8B6"/>
+      <stop offset="1" stop-color="#F0D8B6" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+</svg>
