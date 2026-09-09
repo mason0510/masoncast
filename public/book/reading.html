@@ -327,6 +327,7 @@
             <button type="button" id="mode-day" class="on">日间</button>
             <button type="button" id="mode-eye">护眼</button>
             <button type="button" id="mode-night">夜间</button>
+            <button type="button" id="auto">自动</button>
             <button type="button" id="listen">听书</button>
           </div>
         </div>
@@ -336,7 +337,7 @@
             <article class="leaf right" id="right-page"><div class="pgno" id="rpn"></div></article>
           </div>
         </div>
-        <div class="hint">点右页向后翻 · 点左页向前翻 · ← → 键</div>
+        <div class="hint">点右页向后翻 · 点左页向前翻 · ← → 键 · 自动：听完本摊翻页续读</div>
       </div>
     </section>
   </div>
@@ -373,6 +374,21 @@
       let paraIndex = 0;
       let paras = [];
       let prefetch = { gen: 0, index: -1, blob: null };
+      let autoMode = false;
+
+      function setAuto(on) {
+        autoMode = !!on;
+        const b = document.getElementById("auto");
+        if (b) b.classList.toggle("on", autoMode);
+        try { localStorage.setItem("shenzui-auto", autoMode ? "1" : "0"); } catch (e) {}
+      }
+      document.getElementById("auto").addEventListener("click", function () {
+        setAuto(!autoMode);
+        if (autoMode && current && !(listenBusy || (audio.src && !audio.paused))) {
+          startListen();
+        }
+      });
+      setAuto(false);
 
       function coverHtml(b) {
         return '<div><div class="cover" data-id="' + b.id + '"><b>' +
@@ -455,13 +471,20 @@
           src.start();
         } catch (e) {}
       }
-      function flip(dir) {
-        if (!current || flipping) return;
-        const max = Math.ceil(current.pages.length / 2) - 1;
+      function maxSpread() {
+        if (!current) return 0;
+        return Math.ceil(current.pages.length / 2) - 1;
+      }
+      function canFlip(dir) {
         const next = spread + dir;
-        if (next < 0 || next > max) return;
+        return !!current && next >= 0 && next <= maxSpread();
+      }
+      function flip(dir, keepListen) {
+        if (!current || flipping) return false;
+        const next = spread + dir;
+        if (next < 0 || next > maxSpread()) return false;
         flipping = true;
-        stopListen();
+        if (!keepListen) stopListen();
         paperSound();
         bookEl.classList.add(dir > 0 ? "turn-fwd" : "turn-back");
         setTimeout(function () {
@@ -469,7 +492,16 @@
           renderSpread();
           bookEl.classList.remove("turn-fwd", "turn-back");
           flipping = false;
+          if (keepListen && autoMode) {
+            paras = spreadParas();
+            paraIndex = 0;
+            prefetch = { gen: 0, index: -1, blob: null };
+            if (paras.length) playPara(listenGen);
+            else if (canFlip(1)) flip(1, true);
+            else stopListen();
+          }
         }, 780);
+        return true;
       }
 
       grid.addEventListener("click", function (e) {
@@ -634,7 +666,12 @@
         const btn = document.getElementById("listen");
         if (gen !== listenGen) return;
         if (paraIndex >= paras.length) {
+          if (autoMode && canFlip(1)) {
+            flip(1, true);
+            return;
+          }
           stopListen();
+          if (autoMode) setAuto(false);
           return;
         }
         const text = paras[paraIndex].slice(0, 400);
@@ -676,17 +713,23 @@
         }
       }
 
-      document.getElementById("listen").addEventListener("click", function () {
-        const btn = document.getElementById("listen");
-        if (listenBusy || (audio.src && !audio.paused)) {
-          stopListen();
+      function startListen() {
+        paras = spreadParas();
+        if (!paras.length) {
+          if (autoMode && canFlip(1)) flip(1, true);
           return;
         }
-        paras = spreadParas();
-        if (!paras.length) return;
         paraIndex = 0;
         listenGen += 1;
         playPara(listenGen);
+      }
+      document.getElementById("listen").addEventListener("click", function () {
+        if (listenBusy || (audio.src && !audio.paused)) {
+          stopListen();
+          if (autoMode) setAuto(false);
+          return;
+        }
+        startListen();
       });
 
       fetch("pages.json")
