@@ -535,6 +535,22 @@
         });
       }
 
+      function splitSpeak(text) {
+        const max = 360;
+        if (text.length <= max) return [text];
+        const out = [];
+        let buf = "";
+        for (let i = 0; i < text.length; i++) {
+          buf += text[i];
+          if (buf.length >= max && "。！？；!?;".indexOf(text[i]) >= 0) {
+            out.push(buf.trim());
+            buf = "";
+          }
+        }
+        if (buf.trim()) out.push(buf.trim());
+        return out;
+      }
+
       function spreadParas() {
         if (!current) return [];
         const i = spread * 2;
@@ -544,7 +560,7 @@
           String(page.text).split("\n").forEach(function (line) {
             const t = line.trim();
             if (t.length < 12) return;
-            out.push(t);
+            splitSpeak(t).forEach(function (part) { out.push(part); });
           });
         });
         return out;
@@ -552,7 +568,8 @@
 
       function markPara(text) {
         Array.prototype.forEach.call(document.querySelectorAll(".leaf p"), function (el) {
-          el.classList.toggle("speaking", el.textContent === text);
+          const body = el.textContent || "";
+          el.classList.toggle("speaking", !!(text && body && body.indexOf(text.slice(0, Math.min(20, text.length))) >= 0));
         });
       }
 
@@ -565,7 +582,7 @@
         }
         const text = paras[paraIndex];
         markPara(text);
-        btn.textContent = "本段 " + (paraIndex + 1) + "/" + paras.length;
+        btn.textContent = "合成中 " + (paraIndex + 1) + "/" + paras.length;
         listenBusy = true;
         const local = location.hostname === "127.0.0.1" || location.hostname === "localhost";
         const ttsUrl = local
@@ -586,7 +603,11 @@
           if (!res.ok) throw new Error("HTTP " + res.status);
           const blob = await res.blob();
           if (gen !== listenGen) return;
+          if (audio.src && audio.src.indexOf("blob:") === 0) {
+            URL.revokeObjectURL(audio.src);
+          }
           audio.src = URL.createObjectURL(blob);
+          audio.load();
           audio.onended = function () {
             if (gen !== listenGen) return;
             paraIndex += 1;
