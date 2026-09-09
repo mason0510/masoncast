@@ -172,7 +172,54 @@
       background: var(--chrome-ink);
       color: var(--chrome);
     }
-    .rbar .modes { display: flex; gap: 8px; }
+    .rbar .modes { display: flex; gap: 8px; flex-wrap: wrap; }
+    .rbar .pgjump {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+    }
+    .rbar .pgjump input {
+      width: 52px;
+      border: 1px solid var(--chrome-ink);
+      background: transparent;
+      color: var(--chrome-ink);
+      padding: 3px 6px;
+      font-size: 13px;
+    }
+    .toc-mask {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 40;
+    }
+    .toc-mask.show { display: block; }
+    .toc-panel {
+      position: absolute;
+      top: 56px;
+      left: 20px;
+      width: min(420px, calc(100vw - 40px));
+      max-height: calc(100vh - 90px);
+      overflow: auto;
+      background: var(--chrome);
+      color: var(--chrome-ink);
+      border: 1px solid var(--chrome-ink);
+      padding: 16px 18px 24px;
+      font-family: "Songti SC", "STSong", serif;
+    }
+    .toc-panel h4 { margin: 0 0 12px; font-weight: 600; letter-spacing: 0.16em; }
+    .toc-panel a {
+      display: block;
+      color: inherit;
+      text-decoration: none;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(200,200,200,0.15);
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .toc-panel a:hover { opacity: 0.7; }
     .blot {
       width: 14px; height: 14px; border-radius: 60% 40% 55% 45%;
       background: var(--chrome-ink); display: inline-block; margin-right: 8px;
@@ -322,7 +369,13 @@
       <div class="reader-view" id="reader-view">
         <div class="rbar">
           <button type="button" id="back">书库</button>
+          <button type="button" id="toc-btn">目录</button>
           <div id="r-title"><span class="blot"></span>墨水瓶 · 人鬼之间</div>
+          <div class="pgjump">
+            <span id="pg-pos">1 / 1</span>
+            <input id="pg-go" type="number" min="1" placeholder="页" />
+            <button type="button" id="pg-jump">跳转</button>
+          </div>
           <div class="modes">
             <button type="button" id="mode-day" class="on">日间</button>
             <button type="button" id="mode-eye">护眼</button>
@@ -330,6 +383,9 @@
             <button type="button" id="auto">自动</button>
             <button type="button" id="listen">听书</button>
           </div>
+        </div>
+        <div class="toc-mask" id="toc-mask">
+          <div class="toc-panel" id="toc-panel"><h4>目录</h4><div id="toc-list"></div></div>
         </div>
         <div class="stage">
           <div class="book" id="book">
@@ -430,7 +486,51 @@
         renderLeaf(rightEl, pages[i + 1], "r", i + 2);
         const pct = Math.min(100, Math.round(((i + 2) / pages.length) * 100));
         current.progress = pct + "%";
-        try { localStorage.setItem("shenzui-spread", String(spread)); } catch (e) {}
+        const left = i + 1;
+        const right = pages[i + 1] ? i + 2 : i + 1;
+        const pos = document.getElementById("pg-pos");
+        if (pos) pos.textContent = left + (right !== left ? "–" + right : "") + " / " + pages.length;
+        const inp = document.getElementById("pg-go");
+        if (inp && document.activeElement !== inp) inp.value = String(left);
+        try {
+          localStorage.setItem("shenzui-spread", String(spread));
+          localStorage.setItem("shenzui-page", String(left));
+        } catch (e) {}
+      }
+
+      function jumpToPage(n) {
+        if (!current) return;
+        const total = current.pages.length;
+        n = parseInt(n, 10);
+        if (!isFinite(n)) return;
+        if (n < 1) n = 1;
+        if (n > total) n = total;
+        stopListen();
+        spread = Math.floor((n - 1) / 2);
+        renderSpread();
+        if (autoMode) setTimeout(function () { startListen(); }, 80);
+      }
+
+      function headingOf(page) {
+        const t = String((page && page.text) || "").split("\n")[0].trim();
+        if (/^[一二三四五六七八九十百]+、.{1,24}$/.test(t)) return t;
+        return "";
+      }
+
+      function buildToc() {
+        const box = document.getElementById("toc-list");
+        if (!box || !current) return;
+        const rows = [{ page: 1, title: current.title || "封面" }];
+        const seen = {};
+        current.pages.forEach(function (pg, i) {
+          const h = headingOf(pg);
+          if (!h || seen[h]) return;
+          seen[h] = 1;
+          rows.push({ page: i + 1, title: h });
+        });
+        box.innerHTML = rows.map(function (r) {
+          return '<a data-page="' + r.page + '">' + r.page + "　" + escapeHtml(r.title) + "</a>";
+        }).join("");
       }
       function openBook(b) {
         current = b;
@@ -446,6 +546,7 @@
         readerView.classList.add("show");
         document.querySelector(".window").classList.add("ink");
         renderSpread();
+        buildToc();
         setAuto(true);
         setTimeout(function () { startListen(); }, 120);
       }
@@ -515,6 +616,25 @@
         if (!c) return;
         const b = books.find(function (x) { return x.id === c.getAttribute("data-id"); });
         if (b) openBook(b);
+      });
+      document.getElementById("toc-btn").addEventListener("click", function () {
+        buildToc();
+        document.getElementById("toc-mask").classList.add("show");
+      });
+      document.getElementById("toc-mask").addEventListener("click", function (e) {
+        if (e.target.id === "toc-mask") document.getElementById("toc-mask").classList.remove("show");
+      });
+      document.getElementById("toc-list").addEventListener("click", function (e) {
+        const a = e.target.closest("a");
+        if (!a) return;
+        document.getElementById("toc-mask").classList.remove("show");
+        jumpToPage(a.getAttribute("data-page"));
+      });
+      document.getElementById("pg-jump").addEventListener("click", function () {
+        jumpToPage(document.getElementById("pg-go").value);
+      });
+      document.getElementById("pg-go").addEventListener("keydown", function (e) {
+        if (e.key === "Enter") jumpToPage(this.value);
       });
       document.getElementById("back").addEventListener("click", function () {
         stopListen();
