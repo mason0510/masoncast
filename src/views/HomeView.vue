@@ -5,7 +5,7 @@ import ShowDirectoryCard from '../components/ShowDirectoryCard.vue'
 import { contentLanes, shows } from '../data/catalog'
 
 const publishedShows = computed(() => shows.filter((show) => show.status === 'published'))
-const featuredOrder = ['rengui-zhijian', 'family-parenting', 'li-xiucheng', 'nandu-beigui'] as const
+const featuredOrder = ['nandu-beigui', 'rengui-zhijian'] as const
 const heroCover = computed(
   () => publishedShows.value.find((show) => show.slug === featuredOrder[0])?.coverUrl || publishedShows.value[0]?.coverUrl || '',
 )
@@ -38,23 +38,23 @@ onMounted(() => {
   <main class="shell page-shell">
     <section class="hero">
       <div class="panel hero-copy">
-        <span class="kicker">MasonCast / 入口站</span>
-        <h1>每天打开，就能读、能听、能往下走。</h1>
-        <p class="lead">MasonCast 是我们的节目首页。历史线做长篇与史料，也做沈醉这样的回忆录书；家庭线做写给年轻父母和家里长辈的育儿节目。</p>
+        <span class="kicker">MasonCast</span>
+        <h1>每天打开，就能读、能听。</h1>
+        <p class="lead">历史线听学人与史料，也读沈醉的回忆录。家庭线写给年轻父母，也写给家里长辈。</p>
         <p class="summary">
-          这里不是音频文件夹，也不是临时播放器。书、有声书、专题，都从这一页进去。已经上线《人鬼之间》《南渡北归》《李秀成供词》《家庭育儿系列》。上面先放正在听的，下面按分类列全。以后十档、二十档，还是这个门，不用另起一站。
+          这是节目首页，不是文件夹，也不是临时播放器。《南渡北归》《人鬼之间》《李秀成供词》《家庭育儿系列》都从这里进。先看两档重点，其余按分类在下面。
         </p>
 
         <div class="actions">
-          <button type="button" class="button primary" @click="scrollToSection('featured-shows')">立即收听</button>
-          <button type="button" class="button ghost" @click="scrollToSection('content-lanes')">先看分类</button>
+          <button type="button" class="button primary" @click="scrollToSection('featured-shows')">进入节目</button>
+          <button type="button" class="button ghost" @click="scrollToSection('all-shows')">全部目录</button>
         </div>
 
         <div class="metrics metrics-4">
-          <div class="metric"><strong>{{ showCount }}</strong><span>已上线节目</span></div>
-          <div class="metric"><strong>{{ contentLanes.length }}</strong><span>内容分区</span></div>
-          <div class="metric"><strong>{{ episodeCount }}</strong><span>已收录章节 / 分集</span></div>
-          <div class="metric"><strong>Mobile</strong><span>手机端同步适配</span></div>
+          <div class="metric"><strong>{{ showCount }}</strong><span>节目</span></div>
+          <div class="metric"><strong>2</strong><span>内容线</span></div>
+          <div class="metric"><strong>{{ episodeCount }}</strong><span>分集</span></div>
+          <div class="metric"><strong>书 / 声</strong><span>都能打开</span></div>
         </div>
       </div>
       <div class="panel hero-cover">
@@ -67,7 +67,7 @@ onMounted(() => {
         <div>
           <h2 class="section-title">内容分区</h2>
         </div>
-        <p>先认门：历史是一条线，家庭是一条线。新节目按线往里加，不混成一锅。</p>
+        <p>历史一条线，家庭一条线。</p>
       </div>
       <div class="lane-grid">
         <article v-for="lane in contentLanes" :key="lane.key" class="panel lane-card">
@@ -87,9 +87,9 @@ onMounted(() => {
     <section class="section" id="featured-shows">
       <div class="section-head">
         <div>
-          <h2 class="section-title">推荐收听</h2>
+          <h2 class="section-title">正在听</h2>
         </div>
-        <p>先看见正在听的。其余节目在下面的目录里。</p>
+        <p>《南渡北归》与《人鬼之间》。</p>
       </div>
       <div class="featured-grid">
         <ShowCard v-for="show in featuredShows" :key="show.slug" :show="show" />
@@ -101,7 +101,7 @@ onMounted(() => {
         <div>
           <h2 class="section-title">节目目录</h2>
         </div>
-        <p>按分类进节目页。首页只负责领路，听和读都在节目里完成。</p>
+        <p>点进去听，或打开书。</p>
       </div>
       <div class="catalog-groups">
         <section v-for="group in groupedShows" :key="group.key" class="catalog-group">
@@ -124,20 +124,20 @@ onMounted(() => {
         <div>
           <h2 class="section-title">节目方向</h2>
         </div>
-        <p>同一扇门，两条线。历史读人怎么活；家庭听人怎么带孩子。都不做成一次性播放器。</p>
+        <p>历史读人怎么活过；家庭听人怎么把孩子带大。</p>
       </div>
       <div class="callout-list">
         <div class="callout">
-          <h4>历史：书、长篇、史料</h4>
-          <p>《人鬼之间》是沈醉的回忆录，当书来读。《南渡北归》连续听学人离散。《李秀成供词》把被改过的文本放回现场。</p>
+          <h4>历史</h4>
+          <p>《南渡北归》长篇听。《人鬼之间》当书读。《李秀成供词》对着被改过的文本听。</p>
         </div>
         <div class="callout">
-          <h4>家庭：给父母，也给长辈</h4>
-          <p>《家庭育儿系列》从崔玉涛、鲍秀兰，听到一岁宝宝打完麻腮风后家里最容易误判的事。后面仍按喂养、睡眠、代际分歧往下长。</p>
+          <h4>家庭</h4>
+          <p>《家庭育儿系列》给年轻父母，也给爷爷奶奶。从判断发烧、发育，听到家里最容易说乱的那几句。</p>
         </div>
         <div class="callout">
-          <h4>这一页只领路</h4>
-          <p>看见重点，认清分类，点进节目。节目再多，这里也不会变成一排音频文件。</p>
+          <h4>这一页</h4>
+          <p>只负责让人进得去。节目在各自的页里听完、读完。</p>
         </div>
       </div>
     </section>
