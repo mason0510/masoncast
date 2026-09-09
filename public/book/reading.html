@@ -348,6 +348,7 @@
       const leftEl = document.getElementById("left-page");
       const rightEl = document.getElementById("right-page");
       const audio = new Audio();
+      audio.playbackRate = 1.2;
       let books = [];
       let current = null;
       let spread = 0;
@@ -620,6 +621,7 @@
             URL.revokeObjectURL(audio.src);
           }
           audio.src = URL.createObjectURL(blob);
+          audio.playbackRate = 1.2;
           audio.load();
           audio.onended = function () {
             if (gen !== listenGen) return;
