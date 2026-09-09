@@ -615,7 +615,16 @@
             pages: data.pages || []
           }];
           grid.innerHTML = books.map(coverHtml).join("");
-          if (/(?:\?|&)open=/.test(location.search) && books[0]) openBook(books[0]);
+          var q = new URLSearchParams(location.search);
+          if (q.get("open") && books[0]) {
+            var epMap = { "1": 0, "2": 28, "3": 56, "4": 75, "5": 111, "6": 131, "7": 139 };
+            openBook(books[0]);
+            var ep = q.get("ep");
+            var sp = q.get("spread");
+            if (ep && epMap[ep] != null) spread = epMap[ep];
+            else if (sp && isFinite(parseInt(sp, 10))) spread = parseInt(sp, 10);
+            renderSpread();
+          }
         })
         .catch(function () {
           grid.innerHTML = "<p style='padding:36px;color:#86868b'>打不开 pages.json，请用 http://127.0.0.1:8765/reading.html</p>";
