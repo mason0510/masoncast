@@ -214,7 +214,7 @@ export const shows: Show[] = [
         title: '花花公子的晚节 · 唐生明',
         summary: '从唐生明入敌穴写起。先读他怎么写自己的朋友、上司与晚节。',
         tags: ['唐生明', '军统', '书'],
-        href: asset('book/reading.html?v=20260909c&open=1&ep=1'),
+        href: asset('book/reading.html?v=20260909d&open=1&ep=1'),
       },
       {
         id: 'rengui-02',
@@ -222,7 +222,7 @@ export const shows: Show[] = [
         title: '卢汉云南起义始末',
         summary: '沈醉写他与卢汉的往来、暗杀任务与起义前后。当不可靠叙述来读。',
         tags: ['卢汉', '云南', '书'],
-        href: asset('book/reading.html?v=20260909c&open=1&ep=2'),
+        href: asset('book/reading.html?v=20260909d&open=1&ep=2'),
       },
       {
         id: 'rengui-03',
@@ -230,7 +230,7 @@ export const shows: Show[] = [
         title: '国民党高级将领的另面人生',
         summary: '战犯监狱、秦城农场、特赦。看他如何写自己活下来。',
         tags: ['战犯', '改造', '书'],
-        href: asset('book/reading.html?v=20260909c&open=1&ep=3'),
+        href: asset('book/reading.html?v=20260909d&open=1&ep=3'),
       },
       {
         id: 'rengui-04',
@@ -238,7 +238,7 @@ export const shows: Show[] = [
         title: '末代皇帝的晚年',
         summary: '与溥仪一同改造、参观、工作。权力卸下之后的日常。',
         tags: ['溥仪', '改造', '书'],
-        href: asset('book/reading.html?v=20260909c&open=1&ep=4'),
+        href: asset('book/reading.html?v=20260909d&open=1&ep=4'),
       },
       {
         id: 'rengui-05',
@@ -246,7 +246,7 @@ export const shows: Show[] = [
         title: '徐远举的特务生涯',
         summary: '徐鹏飞原型。破获《挺进报》、骄横与被擒。',
         tags: ['徐远举', '特务', '书'],
-        href: asset('book/reading.html?v=20260909c&open=1&ep=5'),
+        href: asset('book/reading.html?v=20260909d&open=1&ep=5'),
       },
       {
         id: 'rengui-06',
@@ -254,7 +254,7 @@ export const shows: Show[] = [
         title: '张国焘在军统',
         summary: '叛党之后的空头委员、夹着尾巴、被遗弃。',
         tags: ['张国焘', '军统', '书'],
-        href: asset('book/reading.html?v=20260909c&open=1&ep=6'),
+        href: asset('book/reading.html?v=20260909d&open=1&ep=6'),
       },
       {
         id: 'rengui-07',
@@ -262,7 +262,7 @@ export const shows: Show[] = [
         title: '汉奸周佛海的下场',
         summary: '白公馆、汪伪、财尽人亡。收束这一本的人鬼杂处。',
         tags: ['周佛海', '汪伪', '书'],
-        href: asset('book/reading.html?v=20260909c&open=1&ep=7'),
+        href: asset('book/reading.html?v=20260909d&open=1&ep=7'),
       },
     ],
   },
