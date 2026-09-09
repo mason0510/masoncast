@@ -388,7 +388,7 @@
           startListen();
         }
       });
-      setAuto(false);
+      setAuto(true);
 
       function coverHtml(b) {
         return '<div><div class="cover" data-id="' + b.id + '"><b>' +
@@ -437,11 +437,17 @@
         document.getElementById("r-title").innerHTML = '<span class="blot"></span>墨水瓶 · ' + escapeHtml(b.title);
         var saved = 0;
         try { saved = parseInt(localStorage.getItem("shenzui-spread") || "0", 10); } catch (e) {}
-        spread = isFinite(saved) ? saved : 0;
+        var q = new URLSearchParams(location.search);
+        var epMap = { "1": 0, "2": 28, "3": 56, "4": 75, "5": 111, "6": 131, "7": 139 };
+        if (q.get("ep") && epMap[q.get("ep")] != null) spread = epMap[q.get("ep")];
+        else if (q.get("spread") && isFinite(parseInt(q.get("spread"), 10))) spread = parseInt(q.get("spread"), 10);
+        else spread = isFinite(saved) ? saved : 0;
         libView.classList.add("hide");
         readerView.classList.add("show");
         document.querySelector(".window").classList.add("ink");
         renderSpread();
+        setAuto(true);
+        setTimeout(function () { startListen(); }, 120);
       }
       let audioCtx = null;
       function paperSound() {
@@ -704,7 +710,19 @@
             paraIndex += 1;
             playPara(gen);
           };
-          await audio.play();
+          try {
+            await audio.play();
+          } catch (playErr) {
+            btn.textContent = "点一下开始";
+            const once = function () {
+              document.removeEventListener("click", once, true);
+              audio.play().then(function () {
+                btn.textContent = "停止 · " + (paraIndex + 1) + "/" + paras.length;
+              }).catch(function () {});
+            };
+            document.addEventListener("click", once, true);
+            return;
+          }
           btn.textContent = "停止 · " + (paraIndex + 1) + "/" + paras.length;
         } catch (e) {
           if (gen !== listenGen) return;
@@ -744,15 +762,7 @@
           }];
           grid.innerHTML = books.map(coverHtml).join("");
           var q = new URLSearchParams(location.search);
-          if (q.get("open") && books[0]) {
-            var epMap = { "1": 0, "2": 28, "3": 56, "4": 75, "5": 111, "6": 131, "7": 139 };
-            openBook(books[0]);
-            var ep = q.get("ep");
-            var sp = q.get("spread");
-            if (ep && epMap[ep] != null) spread = epMap[ep];
-            else if (sp && isFinite(parseInt(sp, 10))) spread = parseInt(sp, 10);
-            renderSpread();
-          }
+          if (q.get("open") && books[0]) openBook(books[0]);
         })
         .catch(function () {
           grid.innerHTML = "<p style='padding:36px;color:#86868b'>打不开 pages.json，请用 http://127.0.0.1:8765/reading.html</p>";
