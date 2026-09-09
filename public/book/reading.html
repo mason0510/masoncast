@@ -567,20 +567,18 @@
         markPara(text);
         btn.textContent = "本段 " + (paraIndex + 1) + "/" + paras.length;
         listenBusy = true;
-        const ttsUrl = (location.hostname === "127.0.0.1" || location.hostname === "localhost")
+        const local = location.hostname === "127.0.0.1" || location.hostname === "localhost";
+        const ttsUrl = local
           ? "http://127.0.0.1:8765/tts"
-          : "";
-        if (!ttsUrl) {
-          listenBusy = false;
-          btn.textContent = "听书请用本机";
-          return;
-        }
+          : "https://indextts.mwcpool.uk/tts?text=" + encodeURIComponent(text);
         try {
-          const res = await fetch(ttsUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text: text }),
-          });
+          const res = await fetch(ttsUrl, local
+            ? {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: text }),
+              }
+            : { method: "GET" });
           if (gen !== listenGen) return;
           if (!res.ok) throw new Error("HTTP " + res.status);
           const blob = await res.blob();
@@ -604,10 +602,6 @@
         const btn = document.getElementById("listen");
         if (listenBusy || (audio.src && !audio.paused)) {
           stopListen();
-          return;
-        }
-        if (location.hostname !== "127.0.0.1" && location.hostname !== "localhost") {
-          btn.textContent = "听书请用本机";
           return;
         }
         paras = spreadParas();
