@@ -570,15 +570,18 @@
         const local = location.hostname === "127.0.0.1" || location.hostname === "localhost";
         const ttsUrl = local
           ? "http://127.0.0.1:8765/tts"
-          : "https://indextts.mwcpool.uk/tts?text=" + encodeURIComponent(text);
+          : "https://indextts.mwcpool.uk/tts";
         try {
-          const res = await fetch(ttsUrl, local
-            ? {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text: text }),
-              }
-            : { method: "GET" });
+          const ctrl = new AbortController();
+          const timer = setTimeout(function () { ctrl.abort(); }, 90000);
+          const res = await fetch(ttsUrl, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain" },
+            body: text,
+            signal: ctrl.signal,
+            cache: "no-store",
+          });
+          clearTimeout(timer);
           if (gen !== listenGen) return;
           if (!res.ok) throw new Error("HTTP " + res.status);
           const blob = await res.blob();
