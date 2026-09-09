@@ -30,7 +30,7 @@ const scrollToSection = (sectionId: string) => {
 }
 
 onMounted(() => {
-  document.title = 'MasonCast · Podcast Website'
+  document.title = 'MasonCast · 入口站'
 })
 </script>
 
@@ -38,11 +38,11 @@ onMounted(() => {
   <main class="shell page-shell">
     <section class="hero">
       <div class="panel hero-copy">
-        <span class="kicker">MasonCast / Podcast Website</span>
-        <h1>把节目做成真正可持续收听的入口站。</h1>
-        <p class="lead">MasonCast 现在同时有历史与家庭育儿两条内容线：一边做长篇历史与史料专题，一边做写给年轻父母和家里长辈的育儿节目。</p>
+        <span class="kicker">MasonCast / 入口站</span>
+        <h1>每天打开，就能读、能听、能往下走。</h1>
+        <p class="lead">MasonCast 是我们的节目首页。历史线做长篇与史料，也做沈醉这样的回忆录书；家庭线做写给年轻父母和家里长辈的育儿节目。</p>
         <p class="summary">
-          这里不是音频文件夹，也不是临时播放器，而是 MasonCast 的节目首页。当前已经上线《南渡北归》《李秀成供词》《家庭育儿系列》，首页先突出重点节目，完整目录与分类放在下方承接；以后节目增加到十档、二十档，结构也不用重做。
+          这里不是音频文件夹，也不是临时播放器。书、有声书、专题，都从这一页进去。已经上线《人鬼之间》《南渡北归》《李秀成供词》《家庭育儿系列》。上面先放正在听的，下面按分类列全。以后十档、二十档，还是这个门，不用另起一站。
         </p>
 
         <div class="actions">
@@ -67,7 +67,7 @@ onMounted(() => {
         <div>
           <h2 class="section-title">内容分区</h2>
         </div>
-        <p>先把入口做清楚：历史线继续做深，家庭 / 育儿线已经正式上线第一档节目，后续新增仍然按分区往里长。</p>
+        <p>先认门：历史是一条线，家庭是一条线。新节目按线往里加，不混成一锅。</p>
       </div>
       <div class="lane-grid">
         <article v-for="lane in contentLanes" :key="lane.key" class="panel lane-card">
@@ -89,7 +89,7 @@ onMounted(() => {
         <div>
           <h2 class="section-title">推荐收听</h2>
         </div>
-        <p>首页首屏只放重点节目，不让信息一上来就失控；完整目录交给下一屏承接。</p>
+        <p>先看见正在听的。其余节目在下面的目录里。</p>
       </div>
       <div class="featured-grid">
         <ShowCard v-for="show in featuredShows" :key="show.slug" :show="show" />
@@ -101,7 +101,7 @@ onMounted(() => {
         <div>
           <h2 class="section-title">节目目录</h2>
         </div>
-        <p>先按分类看，再进入具体节目页。节目继续增加时，首页仍然只负责入口，完整收听交给节目页。</p>
+        <p>按分类进节目页。首页只负责领路，听和读都在节目里完成。</p>
       </div>
       <div class="catalog-groups">
         <section v-for="group in groupedShows" :key="group.key" class="catalog-group">
@@ -124,27 +124,27 @@ onMounted(() => {
         <div>
           <h2 class="section-title">节目方向</h2>
         </div>
-        <p>每条内容线各做各的，不混成一锅；但在同一个站里，都有稳定入口、节目页和可下载音频。</p>
+        <p>同一扇门，两条线。历史读人怎么活；家庭听人怎么带孩子。都不做成一次性播放器。</p>
       </div>
       <div class="callout-list">
         <div class="callout">
-          <h4>历史内容继续做深</h4>
-          <p>《南渡北归》负责长篇连续收听，《李秀成供词》负责专题密度，历史区继续沿着近代中国这一条主线往下长。</p>
+          <h4>历史：书、长篇、史料</h4>
+          <p>《人鬼之间》是沈醉的回忆录，当书来读。《南渡北归》连续听学人离散。《李秀成供词》把被改过的文本放回现场。</p>
         </div>
         <div class="callout">
-          <h4>家庭 / 育儿先做成系列</h4>
-          <p>《家庭育儿系列》已经从崔玉涛一路展开到鲍秀兰、发育焦虑与一岁宝宝打完麻腮风后的家庭误判，后面继续沿着喂养、睡眠、代际分歧和高频育儿场景往下长。</p>
+          <h4>家庭：给父母，也给长辈</h4>
+          <p>《家庭育儿系列》从崔玉涛、鲍秀兰，听到一岁宝宝打完麻腮风后家里最容易误判的事。后面仍按喂养、睡眠、代际分歧往下长。</p>
         </div>
         <div class="callout">
-          <h4>Home 只做入口，不做堆砌</h4>
-          <p>首页负责给人看到重点节目、理解分类，然后自然进入节目页；节目变多以后，也不会退化成一页音频文件清单。</p>
+          <h4>这一页只领路</h4>
+          <p>看见重点，认清分类，点进节目。节目再多，这里也不会变成一排音频文件。</p>
         </div>
       </div>
     </section>
 
     <footer class="footer">
-      <div>Podcast website: MasonCast</div>
-      <div>当前已上线 3 档节目，内容分成历史与家庭 / 育儿两条线。</div>
+      <div>MasonCast · 入口站</div>
+      <div>历史与家庭两条线。书和节目都从这里进。</div>
     </footer>
   </main>
 </template>
