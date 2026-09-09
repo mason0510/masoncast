@@ -535,10 +535,14 @@
         });
       }
 
+      function compactSpeak(text) {
+        return String(text || "").replace(/[\s\u00a0\u3000]+/g, "");
+      }
+
       function splitSpeak(text) {
         const max = 400;
         const marks = "。！？；!?;";
-        text = String(text || "").trim();
+        text = compactSpeak(text);
         if (!text) return [];
         if (text.length <= max) return [text];
         const out = [];
@@ -566,7 +570,7 @@
         [current.pages[i], current.pages[i + 1]].forEach(function (page) {
           if (!page || !page.text) return;
           String(page.text).split("\n").forEach(function (line) {
-            const t = line.trim();
+            const t = compactSpeak(line);
             if (!t) return;
             splitSpeak(t).forEach(function (part) { out.push(part); });
           });
@@ -576,8 +580,9 @@
 
       function markPara(text) {
         Array.prototype.forEach.call(document.querySelectorAll(".leaf p"), function (el) {
-          const body = el.textContent || "";
-          el.classList.toggle("speaking", !!(text && body && body.indexOf(text.slice(0, Math.min(20, text.length))) >= 0));
+          const body = compactSpeak(el.textContent || "");
+          const needle = compactSpeak(text).slice(0, Math.min(20, compactSpeak(text).length));
+          el.classList.toggle("speaking", !!(needle && body.indexOf(needle) >= 0));
         });
       }
 
