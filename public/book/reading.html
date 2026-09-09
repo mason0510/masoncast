@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>书库</title>
+  <style>
+    :root {
+      --sb: #f2f2f6;
+      --bg: #ffffff;
+      --ink: #1d1d1f;
+      --muted: #86868b;
+      --line: #e5e5ea;
+      --sel: #e8e8ed;
+      --green: #34c759;
+      --paper: #fbf7ee;
+      --paper2: #f3ead6;
+      --gutter: #d9cbb0;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; font-family: -apple-system, "SF Pro Text", "PingFang SC", sans-serif; color: var(--ink); background: #c8c8cc; }
+    .window {
+      height: 100%;
+      display: flex;
+      background: var(--bg);
+    }
+    .sidebar {
+      width: 220px;
+      flex: 0 0 220px;
+      background: var(--sb);
+      border-right: 0.5px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      padding: 12px 10px 16px;
+    }
+    .traffic { display: flex; gap: 8px; padding: 4px 8px 14px; }
+    .traffic i { width: 12px; height: 12px; border-radius: 50%; display: block; }
+    .traffic .r { background: #ff5f57; }
+    .traffic .y { background: #febc2e; }
+    .traffic .g { background: #28c840; }
+    .search {
+      margin: 0 6px 16px;
+      background: #e4e4ea;
+      border: 0;
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-size: 13px;
+      width: calc(100% - 12px);
+      outline: none;
+    }
+    .group { font-size: 11px; color: var(--muted); font-weight: 600; padding: 10px 10px 6px; }
+    .nav {
+      border: 0;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+      padding: 7px 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      color: var(--ink);
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .nav.on { background: var(--sel); font-weight: 600; }
+    .sidebar .foot {
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: #3d3d3d; color: #fff; display: grid; place-items: center; font-size: 13px;
+    }
+    .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .lib-head {
+      padding: 28px 36px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .lib-head h1 { margin: 0; font-size: 34px; font-weight: 700; letter-spacing: -0.03em; }
+    .lib-head .tools { display: flex; gap: 10px; align-items: center; }
+    .lib-head button, .lib-head label.btn {
+      border: 0.5px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .hr { height: 0.5px; background: var(--line); margin: 16px 36px 0; }
+    .grid {
+      padding: 28px 36px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, 160px);
+      gap: 28px 24px;
+    }
+    .cover {
+      width: 148px;
+      height: 210px;
+      border-radius: 2px;
+      background: linear-gradient(180deg, #8b1c1c, #4a0c0c);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 22px 14px;
+      cursor: pointer;
+      box-shadow: 0 10px 24px rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .cover b { font-size: 20px; font-weight: 600; text-align: center; line-height: 1.35; }
+    .cover span { text-align: center; font-size: 13px; opacity: 0.75; }
+    .meta { font-size: 11px; color: var(--muted); margin-top: 8px; display: flex; justify-content: space-between; width: 148px; }
+    .window.ink .sidebar, .window.ink .lib-view { display: none; }
+    .reader-view {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      --page: #fff;
+      --page-ink: #000;
+      --chrome: #fff;
+      --chrome-ink: #000;
+      --stage: #f3f3f3;
+      background: var(--chrome);
+    }
+    .reader-view[data-mode="eye"] {
+      --page: #cfe8d2;
+      --page-ink: #1e2b1f;
+      --chrome: #1e2b1f;
+      --chrome-ink: #dceee0;
+      --stage: #243328;
+    }
+    .reader-view[data-mode="night"] {
+      --page: #121212;
+      --page-ink: #c8c8c8;
+      --chrome: #000;
+      --chrome-ink: #c8c8c8;
+      --stage: #000;
+    }
+    .reader-view.show { display: flex; }
+    .lib-view.hide { display: none; }
+    .rbar {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      color: var(--chrome-ink);
+      background: var(--chrome);
+      border-bottom: 1px solid var(--chrome-ink);
+      letter-spacing: 0.14em;
+      font-family: "Songti SC", "STSong", serif;
+    }
+    .rbar button {
+      border: 1px solid var(--chrome-ink);
+      background: var(--chrome);
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--chrome-ink);
+      padding: 4px 12px;
+      letter-spacing: 0.12em;
+    }
+    .rbar button.on {
+      background: var(--chrome-ink);
+      color: var(--chrome);
+    }
+    .rbar .modes { display: flex; gap: 8px; }
+    .blot {
+      width: 14px; height: 14px; border-radius: 60% 40% 55% 45%;
+      background: var(--chrome-ink); display: inline-block; margin-right: 8px;
+    }
+    .stage {
+      flex: 1;
+      display: grid;
+      place-items: center;
+      perspective: 1400px;
+      overflow: hidden;
+      background: var(--stage);
+    }
+    .book {
+      width: min(980px, 94vw);
+      height: min(680px, 80vh);
+      display: flex;
+      position: relative;
+      border: 1px solid var(--page-ink);
+      background: var(--page);
+      transform-style: preserve-3d;
+    }
+    .leaf {
+      flex: 1;
+      background: var(--page);
+      padding: 32px 36px 40px;
+      overflow: hidden;
+      position: relative;
+      color: var(--page-ink);
+      transform-style: preserve-3d;
+      backface-visibility: hidden;
+    }
+    .leaf.left {
+      border-right: 1px solid var(--page-ink);
+      transform-origin: right center;
+    }
+    .leaf.right { transform-origin: left center; }
+    .leaf .shade {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 3;
+    }
+    .leaf.right .shade {
+      background: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.08) 55%, rgba(0,0,0,.32) 100%);
+    }
+    .leaf.left .shade {
+      background: linear-gradient(270deg, transparent 0%, rgba(0,0,0,.08) 55%, rgba(0,0,0,.32) 100%);
+    }
+    .book.turn-fwd .leaf.right {
+      animation: paperFwd 0.78s cubic-bezier(0.12, 0.72, 0.18, 1) forwards;
+    }
+    .book.turn-back .leaf.left {
+      animation: paperBack 0.78s cubic-bezier(0.12, 0.72, 0.18, 1) forwards;
+    }
+    .book.turn-fwd .leaf.right .shade,
+    .book.turn-back .leaf.left .shade { animation: shadeIn 0.78s ease forwards; }
+    @keyframes paperFwd {
+      0% { transform: rotateY(0) rotateZ(0); }
+      22% { transform: rotateY(-16deg) rotateZ(-0.4deg); }
+      100% { transform: rotateY(-178deg) rotateZ(0); }
+    }
+    @keyframes paperBack {
+      0% { transform: rotateY(0) rotateZ(0); }
+      22% { transform: rotateY(16deg) rotateZ(0.4deg); }
+      100% { transform: rotateY(178deg) rotateZ(0); }
+    }
+    @keyframes shadeIn {
+      0% { opacity: 0; }
+      30% { opacity: 1; }
+      100% { opacity: 0.35; }
+    }
+    .leaf h3 {
+      margin: 0 0 14px;
+      font-size: 16px;
+      font-weight: 600;
+      font-family: "Songti SC", "STSong", serif;
+    }
+    .leaf p {
+      margin: 0 0 0.35em;
+      font-size: 15px;
+      line-height: 1.85;
+      text-align: justify;
+      text-indent: 2em;
+      font-family: "Songti SC", "STSong", "PingFang SC", serif;
+      color: var(--page-ink);
+    }
+    .leaf p.speaking {
+      background: var(--page-ink);
+      color: var(--page);
+    }
+    .leaf.title-page {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    .leaf.title-page h2 {
+      margin: 0 0 18px;
+      font-size: 36px;
+      font-weight: 600;
+      font-family: "Songti SC", "STSong", serif;
+      letter-spacing: 0.12em;
+    }
+    .leaf.title-page .by {
+      font-size: 16px;
+      color: var(--page-ink);
+    }
+    .pgno {
+      position: absolute;
+      bottom: 12px;
+      font-size: 11px;
+      color: var(--page-ink);
+    }
+    .leaf.left .pgno { left: 18px; }
+    .leaf.right .pgno { right: 18px; }
+    .hint { text-align: center; font-size: 12px; color: var(--chrome-ink); padding: 8px 0 14px; letter-spacing: 0.08em; background: var(--chrome); }
+    input[type="file"] { display: none; }
+  </style>
+</head>
+<body>
+  <div class="window">
+    <aside class="sidebar">
+      <div class="traffic"><i class="r"></i><i class="y"></i><i class="g"></i></div>
+      <input class="search" placeholder="搜索" />
+      <div class="group">书库</div>
+      <button class="nav on" data-sec="all">全部</button>
+      <button class="nav" data-sec="pdf">PDF</button>
+      <button class="nav" data-sec="book">图书</button>
+      <div class="group">我的藏书</div>
+      <button class="nav" type="button" id="import-nav">＋ 导入文本</button>
+      <div class="foot"><div class="avatar">X</div>xiaocong zhang</div>
+    </aside>
+    <section class="main">
+      <div class="lib-view" id="lib-view">
+        <div class="lib-head">
+          <h1 id="sec-title">全部</h1>
+          <div class="tools">
+            <label class="btn">导入<input type="file" id="file" accept=".txt,.md" /></label>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="grid" id="grid"></div>
+      </div>
+      <div class="reader-view" id="reader-view">
+        <div class="rbar">
+          <button type="button" id="back">书库</button>
+          <div id="r-title"><span class="blot"></span>墨水瓶 · 人鬼之间</div>
+          <div class="modes">
+            <button type="button" id="mode-day" class="on">日间</button>
+            <button type="button" id="mode-eye">护眼</button>
+            <button type="button" id="mode-night">夜间</button>
+            <button type="button" id="listen">听书</button>
+          </div>
+        </div>
+        <div class="stage">
+          <div class="book" id="book">
+            <article class="leaf left" id="left-page"><div class="pgno" id="lpn"></div></article>
+            <article class="leaf right" id="right-page"><div class="pgno" id="rpn"></div></article>
+          </div>
+        </div>
+        <div class="hint">点右页向后翻 · 点左页向前翻 · ← → 键</div>
+      </div>
+    </section>
+  </div>
+  <script>
+    (function () {
+      const grid = document.getElementById("grid");
+      const libView = document.getElementById("lib-view");
+      const readerView = document.getElementById("reader-view");
+      const bookEl = document.getElementById("book");
+      const leftEl = document.getElementById("left-page");
+      const rightEl = document.getElementById("right-page");
+      const audio = new Audio();
+      let books = [];
+      let current = null;
+      let spread = 0;
+      let flipping = false;
+      function setMode(mode) {
+        readerView.setAttribute("data-mode", mode === "day" ? "" : mode);
+        if (mode === "day") readerView.removeAttribute("data-mode");
+        else readerView.setAttribute("data-mode", mode);
+        ["day", "eye", "night"].forEach(function (m) {
+          const b = document.getElementById("mode-" + m);
+          if (b) b.classList.toggle("on", m === mode);
+        });
+        try { localStorage.setItem("shenzui-mode", mode); } catch (e) {}
+      }
+      document.getElementById("mode-day").addEventListener("click", function () { setMode("day"); });
+      document.getElementById("mode-eye").addEventListener("click", function () { setMode("eye"); });
+      document.getElementById("mode-night").addEventListener("click", function () { setMode("night"); });
+      setMode("day");
+      let listenBusy = false;
+      let listenGen = 0;
+      let paraIndex = 0;
+      let paras = [];
+
+      function coverHtml(b) {
+        return '<div><div class="cover" data-id="' + b.id + '"><b>' +
+          escapeHtml(b.title) + "</b><span>" + escapeHtml(b.author) +
+          '</span></div><div class="meta"><span>' + (b.progress || "0%") +
+          "</span><span>…</span></div></div>";
+      }
+      function escapeHtml(s) {
+        return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+      }
+      function renderLeaf(el, page, side, n) {
+        el.classList.remove("title-page");
+        const num = '<div class="pgno" id="' + side + 'pn">' + (page ? n : "") + "</div>";
+        if (!page) {
+          el.innerHTML = num + '<div class="shade"></div>';
+          return;
+        }
+        if (page.type === "title") {
+          el.classList.add("title-page");
+          const lines = String(page.text || "").split("\n");
+          el.innerHTML = "<h2>" + escapeHtml(lines[0] || "") + "</h2><div class=\"by\">" +
+            escapeHtml(lines[1] || "") + "</div>" + num + '<div class="shade"></div>';
+          return;
+        }
+        const parts = String(page.text || "").split("\n").filter(Boolean);
+        el.innerHTML = parts.map(function (p, i) {
+          if (i === 0 && p.length < 40) return "<h3>" + escapeHtml(p) + "</h3>";
+          return "<p>" + escapeHtml(p) + "</p>";
+        }).join("") + num + '<div class="shade"></div>';
+      }
+      function renderSpread() {
+        if (!current) return;
+        const pages = current.pages;
+        const i = spread * 2;
+        renderLeaf(leftEl, pages[i], "l", i + 1);
+        renderLeaf(rightEl, pages[i + 1], "r", i + 2);
+        const pct = Math.min(100, Math.round(((i + 2) / pages.length) * 100));
+        current.progress = pct + "%";
+        try { localStorage.setItem("shenzui-spread", String(spread)); } catch (e) {}
+      }
+      function openBook(b) {
+        current = b;
+        document.getElementById("r-title").innerHTML = '<span class="blot"></span>墨水瓶 · ' + escapeHtml(b.title);
+        var saved = 0;
+        try { saved = parseInt(localStorage.getItem("shenzui-spread") || "0", 10); } catch (e) {}
+        spread = isFinite(saved) ? saved : 0;
+        libView.classList.add("hide");
+        readerView.classList.add("show");
+        document.querySelector(".window").classList.add("ink");
+        renderSpread();
+      }
+      let audioCtx = null;
+      function paperSound() {
+        try {
+          audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+          const ctx = audioCtx;
+          const dur = 0.22;
+          const buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * dur), ctx.sampleRate);
+          const data = buf.getChannelData(0);
+          for (let i = 0; i < data.length; i++) {
+            const t = i / data.length;
+            const env = Math.pow(1 - t, 1.6) * (t < 0.05 ? t / 0.05 : 1);
+            data[i] = (Math.random() * 2 - 1) * env * 0.42;
+          }
+          const src = ctx.createBufferSource();
+          src.buffer = buf;
+          const bp = ctx.createBiquadFilter();
+          bp.type = "bandpass";
+          bp.frequency.value = 2100;
+          bp.Q.value = 0.55;
+          const hp = ctx.createBiquadFilter();
+          hp.type = "highpass";
+          hp.frequency.value = 700;
+          src.connect(hp);
+          hp.connect(bp);
+          bp.connect(ctx.destination);
+          src.start();
+        } catch (e) {}
+      }
+      function flip(dir) {
+        if (!current || flipping) return;
+        const max = Math.ceil(current.pages.length / 2) - 1;
+        const next = spread + dir;
+        if (next < 0 || next > max) return;
+        flipping = true;
+        stopListen();
+        paperSound();
+        bookEl.classList.add(dir > 0 ? "turn-fwd" : "turn-back");
+        setTimeout(function () {
+          spread = next;
+          renderSpread();
+          bookEl.classList.remove("turn-fwd", "turn-back");
+          flipping = false;
+        }, 780);
+      }
+
+      grid.addEventListener("click", function (e) {
+        const c = e.target.closest(".cover");
+        if (!c) return;
+        const b = books.find(function (x) { return x.id === c.getAttribute("data-id"); });
+        if (b) openBook(b);
+      });
+      document.getElementById("back").addEventListener("click", function () {
+        stopListen();
+        readerView.classList.remove("show");
+        libView.classList.remove("hide");
+        document.querySelector(".window").classList.remove("ink");
+        grid.innerHTML = books.map(coverHtml).join("");
+      });
+      document.getElementById("right-page").addEventListener("click", function () { flip(1); });
+      document.getElementById("left-page").addEventListener("click", function () { flip(-1); });
+      document.addEventListener("keydown", function (e) {
+        if (!readerView.classList.contains("show")) return;
+        if (e.key === "ArrowRight") flip(1);
+        if (e.key === "ArrowLeft") flip(-1);
+      });
+
+      function addImported(title, text) {
+        const paras = text.split(/\n+/).map(function (s) { return s.trim(); }).filter(Boolean);
+        const pages = [];
+        let buf = [];
+        let n = 0;
+        paras.forEach(function (p) {
+          if (n >= 700 && buf.length) {
+            pages.push({ text: buf.join("\n") });
+            buf = [p];
+            n = p.length;
+          } else {
+            buf.push(p);
+            n += p.length;
+          }
+        });
+        if (buf.length) pages.push({ text: buf.join("\n") });
+        const b = {
+          id: "imp-" + Date.now(),
+          title: title.replace(/\.(txt|md)$/i, ""),
+          author: "导入",
+          progress: "0%",
+          pages: pages
+        };
+        books.push(b);
+        grid.innerHTML = books.map(coverHtml).join("");
+      }
+      document.getElementById("file").addEventListener("change", function () {
+        const f = this.files && this.files[0];
+        if (!f) return;
+        const reader = new FileReader();
+        reader.onload = function () { addImported(f.name, String(reader.result || "")); };
+        reader.readAsText(f, "utf-8");
+      });
+      document.getElementById("import-nav").addEventListener("click", function () {
+        document.getElementById("file").click();
+      });
+
+      function stopListen() {
+        listenGen += 1;
+        listenBusy = false;
+        audio.pause();
+        audio.removeAttribute("src");
+        document.getElementById("listen").textContent = "听书";
+        Array.prototype.forEach.call(document.querySelectorAll("p.speaking"), function (el) {
+          el.classList.remove("speaking");
+        });
+      }
+
+      function spreadParas() {
+        if (!current) return [];
+        const i = spread * 2;
+        const out = [];
+        [current.pages[i], current.pages[i + 1]].forEach(function (page) {
+          if (!page || !page.text) return;
+          String(page.text).split("\n").forEach(function (line) {
+            const t = line.trim();
+            if (t.length < 12) return;
+            out.push(t);
+          });
+        });
+        return out;
+      }
+
+      function markPara(text) {
+        Array.prototype.forEach.call(document.querySelectorAll(".leaf p"), function (el) {
+          el.classList.toggle("speaking", el.textContent === text);
+        });
+      }
+
+      async function playPara(gen) {
+        const btn = document.getElementById("listen");
+        if (gen !== listenGen) return;
+        if (paraIndex >= paras.length) {
+          stopListen();
+          return;
+        }
+        const text = paras[paraIndex];
+        markPara(text);
+        btn.textContent = "本段 " + (paraIndex + 1) + "/" + paras.length;
+        listenBusy = true;
+        try {
+          const res = await fetch("/tts", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: text }),
+          });
+          if (gen !== listenGen) return;
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          const blob = await res.blob();
+          if (gen !== listenGen) return;
+          audio.src = URL.createObjectURL(blob);
+          audio.onended = function () {
+            if (gen !== listenGen) return;
+            paraIndex += 1;
+            playPara(gen);
+          };
+          await audio.play();
+          btn.textContent = "停止 · " + (paraIndex + 1) + "/" + paras.length;
+        } catch (e) {
+          if (gen !== listenGen) return;
+          btn.textContent = "本段失败";
+          listenBusy = false;
+        }
+      }
+
+      document.getElementById("listen").addEventListener("click", function () {
+        const btn = document.getElementById("listen");
+        if (listenBusy || (audio.src && !audio.paused)) {
+          stopListen();
+          return;
+        }
+        paras = spreadParas();
+        if (!paras.length) return;
+        paraIndex = 0;
+        listenGen += 1;
+        playPara(listenGen);
+      });
+
+      fetch("pages.json")
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          books = [{
+            id: "shenzui",
+            title: data.book || "人鬼之间",
+            author: data.author || "沈醉",
+            progress: "1%",
+            pages: data.pages || []
+          }];
+          grid.innerHTML = books.map(coverHtml).join("");
+          if (/(?:\?|&)open=/.test(location.search) && books[0]) openBook(books[0]);
+        })
+        .catch(function () {
+          grid.innerHTML = "<p style='padding:36px;color:#86868b'>打不开 pages.json，请用 http://127.0.0.1:8765/reading.html</p>";
+        });
+    })();
+  </script>
+</body>
+</html>

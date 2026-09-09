@@ -13,6 +13,7 @@ export interface Episode {
   tags: string[]
   downloadName?: string
   external?: boolean
+  href?: string
 }
 
 export interface Show {
