@@ -567,7 +567,7 @@
           if (!page || !page.text) return;
           String(page.text).split("\n").forEach(function (line) {
             const t = line.trim();
-            if (t.length < 12) return;
+            if (!t) return;
             splitSpeak(t).forEach(function (part) { out.push(part); });
           });
         });
@@ -588,7 +588,7 @@
           stopListen();
           return;
         }
-        const text = paras[paraIndex];
+        const text = paras[paraIndex].slice(0, 400);
         markPara(text);
         btn.textContent = "合成中 " + (paraIndex + 1) + "/" + paras.length;
         listenBusy = true;
