@@ -6,7 +6,7 @@ export interface Episode {
   number: string
   title: string
   summary: string
-  audioUrl: string
+  audioUrl?: string
   coverUrl?: string
   duration?: string
   size?: string

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1200">
+  <rect width="800" height="1200" fill="#000"/>
+  <rect x="72" y="96" width="656" height="1008" fill="#fff"/>
+  <text x="400" y="520" text-anchor="middle" fill="#000" font-size="64" font-family="Songti SC, STSong, serif">人鬼之间</text>
+  <text x="400" y="600" text-anchor="middle" fill="#000" font-size="28" font-family="Songti SC, STSong, serif">沈醉</text>
+  <text x="400" y="980" text-anchor="middle" fill="#000" font-size="18" font-family="Songti SC, STSong, serif" letter-spacing="6">MASONCAST · BOOK</text>
+</svg>

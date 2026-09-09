@@ -190,13 +190,82 @@ export const shows: Show[] = [
       },
     ],
   },
+  {
+    showNumber: '节目 04',
+    slug: 'rengui-zhijian',
+    title: '人鬼之间',
+    eyebrow: 'Memoir / Unreliable Narrator',
+    lead: '沈醉的回忆录。先是书，不是预合成的全书音频。',
+    summary:
+      '《人鬼之间》写军统、改造、唐生明、卢汉、战犯监狱、溥仪与徐远举。作者同时是打手、幸存者、被改造者、后来的写作人。节目页按篇目进入；听书只合成正在读的那一段。',
+    coverUrl: asset('assets/covers/rengui-zhijian-cover.svg'),
+    homeTag: '墨水瓶书',
+    homeDescription: '沈醉回忆录。把当事人事后自述做成可以每天打开的书。',
+    badges: ['7 篇', '墨水瓶', '逐段听书'],
+    statement:
+      '南渡北归写一代学人的离散与归来。人鬼之间写同一种大时代里，另一个位置上的人怎样叙述自己的手、自己的活、自己的晚节。',
+    categoryKey: 'history',
+    categoryLabel: '历史',
+    status: 'published',
+    episodes: [
+      {
+        id: 'rengui-01',
+        number: 'EP01',
+        title: '花花公子的晚节 · 唐生明',
+        summary: '从唐生明入敌穴写起。先读他怎么写自己的朋友、上司与晚节。',
+        tags: ['唐生明', '军统', '书'],
+      },
+      {
+        id: 'rengui-02',
+        number: 'EP02',
+        title: '卢汉云南起义始末',
+        summary: '沈醉写他与卢汉的往来、暗杀任务与起义前后。当不可靠叙述来读。',
+        tags: ['卢汉', '云南', '书'],
+      },
+      {
+        id: 'rengui-03',
+        number: 'EP03',
+        title: '国民党高级将领的另面人生',
+        summary: '战犯监狱、秦城农场、特赦。看他如何写自己活下来。',
+        tags: ['战犯', '改造', '书'],
+      },
+      {
+        id: 'rengui-04',
+        number: 'EP04',
+        title: '末代皇帝的晚年',
+        summary: '与溥仪一同改造、参观、工作。权力卸下之后的日常。',
+        tags: ['溥仪', '改造', '书'],
+      },
+      {
+        id: 'rengui-05',
+        number: 'EP05',
+        title: '徐远举的特务生涯',
+        summary: '徐鹏飞原型。破获《挺进报》、骄横与被擒。',
+        tags: ['徐远举', '特务', '书'],
+      },
+      {
+        id: 'rengui-06',
+        number: 'EP06',
+        title: '张国焘在军统',
+        summary: '叛党之后的空头委员、夹着尾巴、被遗弃。',
+        tags: ['张国焘', '军统', '书'],
+      },
+      {
+        id: 'rengui-07',
+        number: 'EP07',
+        title: '汉奸周佛海的下场',
+        summary: '白公馆、汪伪、财尽人亡。收束这一本的人鬼杂处。',
+        tags: ['周佛海', '汪伪', '书'],
+      },
+    ],
+  },
 ]
 
 const laneMeta: Record<ContentLaneKey, Omit<ContentLane, 'showCount' | 'stateLabel' | 'entryLabel' | 'href'>> = {
   history: {
     key: 'history',
     title: '历史',
-    description: '当前主内容区。收录《南渡北归》《李秀成供词》这类围绕近代中国、人物命运与文本现场展开的节目。',
+    description: '当前主内容区。收录《南渡北归》《李秀成供词》《人鬼之间》这类围绕近代中国、人物命运与文本现场展开的节目。',
   },
   family: {
     key: 'family',

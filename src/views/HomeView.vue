@@ -5,7 +5,7 @@ import ShowDirectoryCard from '../components/ShowDirectoryCard.vue'
 import { contentLanes, shows } from '../data/catalog'
 
 const publishedShows = computed(() => shows.filter((show) => show.status === 'published'))
-const featuredOrder = ['family-parenting', 'li-xiucheng', 'nandu-beigui'] as const
+const featuredOrder = ['rengui-zhijian', 'family-parenting', 'li-xiucheng', 'nandu-beigui'] as const
 const heroCover = computed(
   () => publishedShows.value.find((show) => show.slug === featuredOrder[0])?.coverUrl || publishedShows.value[0]?.coverUrl || '',
 )

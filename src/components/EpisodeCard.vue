@@ -21,13 +21,14 @@ const metaItems = [props.episode.duration, props.episode.size, ...props.episode.
       </div>
       <h3>{{ episode.title }}</h3>
       <p>{{ episode.summary }}</p>
-      <audio controls preload="none">
+      <audio v-if="episode.audioUrl" controls preload="none">
         <source :src="episode.audioUrl" :type="episode.audioUrl.endsWith('.m4a') ? 'audio/mp4' : 'audio/mpeg'" />
       </audio>
-      <div class="audio-actions">
+      <div v-if="episode.audioUrl" class="audio-actions">
         <a :href="episode.audioUrl" target="_blank" rel="noreferrer">{{ episode.external ? '打开音频' : '在线播放' }}</a>
         <a :href="episode.audioUrl" :download="episode.downloadName || true">下载音频</a>
       </div>
+      <p v-else class="summary">本篇是书。音频随读一段合成，不预挂全书。</p>
     </div>
   </article>
 </template>
