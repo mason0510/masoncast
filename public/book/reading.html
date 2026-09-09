@@ -566,8 +566,14 @@
         markPara(text);
         btn.textContent = "本段 " + (paraIndex + 1) + "/" + paras.length;
         listenBusy = true;
+        const ttsUrl = (location.hostname === "127.0.0.1" || location.hostname === "localhost") ? "/tts" : "";
+        if (!ttsUrl) {
+          listenBusy = false;
+          btn.textContent = "听书请用本机";
+          return;
+        }
         try {
-          const res = await fetch("/tts", {
+          const res = await fetch(ttsUrl, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ text: text }),
@@ -595,6 +601,10 @@
         const btn = document.getElementById("listen");
         if (listenBusy || (audio.src && !audio.paused)) {
           stopListen();
+          return;
+        }
+        if (location.hostname !== "127.0.0.1" && location.hostname !== "localhost") {
+          btn.textContent = "听书请用本机";
           return;
         }
         paras = spreadParas();
