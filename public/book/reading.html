@@ -536,18 +536,26 @@
       }
 
       function splitSpeak(text) {
-        const max = 360;
+        const max = 400;
+        const marks = "。！？；!?;";
+        text = String(text || "").trim();
+        if (!text) return [];
         if (text.length <= max) return [text];
         const out = [];
-        let buf = "";
-        for (let i = 0; i < text.length; i++) {
-          buf += text[i];
-          if (buf.length >= max && "。！？；!?;".indexOf(text[i]) >= 0) {
-            out.push(buf.trim());
-            buf = "";
+        let rest = text;
+        while (rest.length > max) {
+          let cut = -1;
+          for (let i = max; i >= 240; i--) {
+            if (marks.indexOf(rest.charAt(i)) >= 0) {
+              cut = i + 1;
+              break;
+            }
           }
+          if (cut < 1) cut = max;
+          out.push(rest.slice(0, cut).trim());
+          rest = rest.slice(cut).trim();
         }
-        if (buf.trim()) out.push(buf.trim());
+        if (rest) out.push(rest);
         return out;
       }
 
