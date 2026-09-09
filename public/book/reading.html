@@ -260,7 +260,8 @@
       font-family: "Songti SC", "STSong", "PingFang SC", serif;
       color: var(--page-ink);
     }
-    .leaf p.speaking {
+    .leaf p.speaking,
+    .leaf .speak-chunk {
       background: var(--page-ink);
       color: var(--page);
     }
@@ -371,6 +372,7 @@
       let listenGen = 0;
       let paraIndex = 0;
       let paras = [];
+      let prefetch = { gen: 0, index: -1, blob: null };
 
       function coverHtml(b) {
         return '<div><div class="cover" data-id="' + b.id + '"><b>' +
@@ -400,6 +402,9 @@
           if (i === 0 && p.length < 40) return "<h3>" + escapeHtml(p) + "</h3>";
           return "<p>" + escapeHtml(p) + "</p>";
         }).join("") + num + '<div class="shade"></div>';
+        Array.prototype.forEach.call(el.querySelectorAll("p"), function (node) {
+          node.setAttribute("data-raw", node.textContent || "");
+        });
       }
       function renderSpread() {
         if (!current) return;
@@ -528,6 +533,7 @@
       function stopListen() {
         listenGen += 1;
         listenBusy = false;
+        prefetch = { gen: 0, index: -1, blob: null };
         audio.pause();
         audio.removeAttribute("src");
         document.getElementById("listen").textContent = "听书";
@@ -579,12 +585,49 @@
         return out;
       }
 
+      function wrapChunk(raw, chunk) {
+        const compact = compactSpeak(raw);
+        const needle = compactSpeak(chunk);
+        if (!needle) return escapeHtml(raw);
+        const at = compact.indexOf(needle);
+        if (at < 0) return escapeHtml(raw);
+        const map = [];
+        for (let i = 0; i < raw.length; i++) {
+          if (!/[\s\u00a0\u3000]/.test(raw.charAt(i))) map.push(i);
+        }
+        const a = map[at];
+        const b = map[at + needle.length - 1] + 1;
+        return escapeHtml(raw.slice(0, a)) +
+          '<span class="speak-chunk">' + escapeHtml(raw.slice(a, b)) + "</span>" +
+          escapeHtml(raw.slice(b));
+      }
+
       function markPara(text) {
         Array.prototype.forEach.call(document.querySelectorAll(".leaf p"), function (el) {
-          const body = compactSpeak(el.textContent || "");
-          const needle = compactSpeak(text).slice(0, Math.min(20, compactSpeak(text).length));
-          el.classList.toggle("speaking", !!(needle && body.indexOf(needle) >= 0));
+          const raw = el.getAttribute("data-raw") || el.textContent || "";
+          el.classList.remove("speaking");
+          el.innerHTML = wrapChunk(raw, text || "");
         });
+      }
+
+      async function fetchTts(text, gen) {
+        const local = location.hostname === "127.0.0.1" || location.hostname === "localhost";
+        const ttsUrl = local
+          ? "http://127.0.0.1:8765/tts"
+          : "https://indextts.mwcpool.uk/tts";
+        const ctrl = new AbortController();
+        const timer = setTimeout(function () { ctrl.abort(); }, 90000);
+        const res = await fetch(ttsUrl, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain" },
+          body: text,
+          signal: ctrl.signal,
+          cache: "no-store",
+        });
+        clearTimeout(timer);
+        if (gen !== listenGen) return null;
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.blob();
       }
 
       async function playPara(gen) {
@@ -598,25 +641,21 @@
         markPara(text);
         btn.textContent = "合成中 " + (paraIndex + 1) + "/" + paras.length;
         listenBusy = true;
-        const local = location.hostname === "127.0.0.1" || location.hostname === "localhost";
-        const ttsUrl = local
-          ? "http://127.0.0.1:8765/tts"
-          : "https://indextts.mwcpool.uk/tts";
         try {
-          const ctrl = new AbortController();
-          const timer = setTimeout(function () { ctrl.abort(); }, 90000);
-          const res = await fetch(ttsUrl, {
-            method: "POST",
-            headers: { "Content-Type": "text/plain" },
-            body: text,
-            signal: ctrl.signal,
-            cache: "no-store",
-          });
-          clearTimeout(timer);
-          if (gen !== listenGen) return;
-          if (!res.ok) throw new Error("HTTP " + res.status);
-          const blob = await res.blob();
-          if (gen !== listenGen) return;
+          let blob = null;
+          if (prefetch.gen === gen && prefetch.index === paraIndex && prefetch.blob) {
+            blob = prefetch.blob;
+            prefetch = { gen: 0, index: -1, blob: null };
+          } else {
+            blob = await fetchTts(text, gen);
+          }
+          if (gen !== listenGen || !blob) return;
+          const next = paraIndex + 1;
+          if (next < paras.length) {
+            fetchTts(paras[next].slice(0, 400), gen).then(function (b) {
+              if (gen === listenGen && b) prefetch = { gen: gen, index: next, blob: b };
+            }).catch(function () {});
+          }
           if (audio.src && audio.src.indexOf("blob:") === 0) {
             URL.revokeObjectURL(audio.src);
           }
