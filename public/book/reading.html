@@ -585,7 +585,7 @@
       }
 
       function splitSpeak(text) {
-        const max = 400;
+        const max = 250;
         const marks = "。！？；!?;";
         text = compactSpeak(text);
         if (!text) return [];
@@ -594,7 +594,7 @@
         let rest = text;
         while (rest.length > max) {
           let cut = -1;
-          for (let i = max; i >= 240; i--) {
+          for (let i = max; i >= 150; i--) {
             if (marks.indexOf(rest.charAt(i)) >= 0) {
               cut = i + 1;
               break;
@@ -680,7 +680,7 @@
           if (autoMode) setAuto(false);
           return;
         }
-        const text = paras[paraIndex].slice(0, 400);
+        const text = paras[paraIndex].slice(0, 250);
         markPara(text);
         btn.textContent = "合成中 " + (paraIndex + 1) + "/" + paras.length;
         listenBusy = true;
@@ -695,7 +695,7 @@
           if (gen !== listenGen || !blob) return;
           const next = paraIndex + 1;
           if (next < paras.length) {
-            fetchTts(paras[next].slice(0, 400), gen).then(function (b) {
+            fetchTts(paras[next].slice(0, 250), gen).then(function (b) {
               if (gen === listenGen && b) prefetch = { gen: gen, index: next, blob: b };
             }).catch(function () {});
           }
