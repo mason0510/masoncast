@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Cache-Control" content="no-store" />
   <title>书库</title>
   <style>
     :root {
@@ -566,7 +567,9 @@
         markPara(text);
         btn.textContent = "本段 " + (paraIndex + 1) + "/" + paras.length;
         listenBusy = true;
-        const ttsUrl = (location.hostname === "127.0.0.1" || location.hostname === "localhost") ? "/tts" : "";
+        const ttsUrl = (location.hostname === "127.0.0.1" || location.hostname === "localhost")
+          ? "http://127.0.0.1:8765/tts"
+          : "";
         if (!ttsUrl) {
           listenBusy = false;
           btn.textContent = "听书请用本机";
